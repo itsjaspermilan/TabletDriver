@@ -129,7 +129,18 @@ private struct GeneralTab: View {
 
 private struct BindingsTab: View {
     @ObservedObject var driver: DriverController
+    // `driver.bindingStore` is its own ObservableObject nested inside
+    // `driver` -- its @Published changes don't propagate through `driver`'s
+    // own observation, so this view needs to observe it directly or rows
+    // never visually update after recording a shortcut (the binding is
+    // still saved correctly; only the displayed label goes stale).
+    @ObservedObject private var bindingStore: BindingStore
     @State private var selectedContext: String = BindingStore.defaultContext
+
+    init(driver: DriverController) {
+        self.driver = driver
+        self.bindingStore = driver.bindingStore
+    }
 
     /// Falls back to a reasonable default so bindings can still be
     /// configured before a tablet is connected.
@@ -147,7 +158,7 @@ private struct BindingsTab: View {
             HStack {
                 Picker("Editing bindings for", selection: $selectedContext) {
                     Text("Default (all apps)").tag(BindingStore.defaultContext)
-                    ForEach(driver.bindingStore.appContextOrder, id: \.self) { bundleID in
+                    ForEach(bindingStore.appContextOrder, id: \.self) { bundleID in
                         Text(displayName(for: bundleID)).tag(bundleID)
                     }
                 }
@@ -157,7 +168,7 @@ private struct BindingsTab: View {
                     ForEach(runningApps, id: \.bundleIdentifier) { app in
                         Button(app.localizedName ?? app.bundleIdentifier!) {
                             if let bundleID = app.bundleIdentifier {
-                                driver.bindingStore.addAppContext(bundleID)
+                                bindingStore.addAppContext(bundleID)
                                 selectedContext = bundleID
                             }
                         }
@@ -166,7 +177,7 @@ private struct BindingsTab: View {
 
                 if selectedContext != BindingStore.defaultContext {
                     Button("Remove Override") {
-                        driver.bindingStore.removeAppContext(selectedContext)
+                        bindingStore.removeAppContext(selectedContext)
                         selectedContext = BindingStore.defaultContext
                     }
                 }
@@ -184,8 +195,8 @@ private struct BindingsTab: View {
                                 ForEach(0..<penButtonCount, id: \.self) { index in
                                     BindingRow(
                                         label: "Button \(index + 1)",
-                                        action: driver.bindingStore.binding(context: selectedContext, kind: .penButton, index: index),
-                                        onChange: { driver.bindingStore.setBinding($0, kind: .penButton, index: index, context: selectedContext) }
+                                        action: bindingStore.binding(context: selectedContext, kind: .penButton, index: index),
+                                        onChange: { bindingStore.setBinding($0, kind: .penButton, index: index, context: selectedContext) }
                                     )
                                 }
                             }
@@ -197,8 +208,8 @@ private struct BindingsTab: View {
                             ForEach(0..<expressKeyCount, id: \.self) { index in
                                 BindingRow(
                                     label: "Key \(index + 1)",
-                                    action: driver.bindingStore.binding(context: selectedContext, kind: .expressKey, index: index),
-                                    onChange: { driver.bindingStore.setBinding($0, kind: .expressKey, index: index, context: selectedContext) }
+                                    action: bindingStore.binding(context: selectedContext, kind: .expressKey, index: index),
+                                    onChange: { bindingStore.setBinding($0, kind: .expressKey, index: index, context: selectedContext) }
                                 )
                             }
                         }
