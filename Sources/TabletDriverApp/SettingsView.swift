@@ -287,7 +287,7 @@ private struct AboutTab: View {
             .foregroundStyle(.secondary)
             .frame(maxWidth: 360)
 
-            Link("View on GitHub", destination: URL(string: "https://github.com")!)
+            Link("View on GitHub", destination: URL(string: "https://github.com/itsjaspermilan/TabletDriver")!)
                 .font(.callout)
 
             Spacer(minLength: 8)
