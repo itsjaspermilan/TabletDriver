@@ -13,6 +13,10 @@ let package = Package(
         .executableTarget(
             name: "TabletDriverApp",
             dependencies: ["TabletDriverKit"]
+        ),
+        .testTarget(
+            name: "TabletDriverKitTests",
+            dependencies: ["TabletDriverKit"]
         )
     ]
 )

@@ -81,6 +81,11 @@ public final class DriverController: ObservableObject {
             previousAuxButtons = aux.buttons
             return
         }
+        // Express keys are typically only reported when something actually
+        // changes, but guard anyway: frontmostApplication is a real IPC
+        // call, not worth paying for on a report that changed nothing.
+        guard aux.buttons != previousAuxButtons else { return }
+
         let frontmostBundleID = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
         let bindings = bindingStore.bindings(for: frontmostBundleID, kind: .expressKey, count: aux.buttons.count)
 
@@ -100,6 +105,11 @@ public final class DriverController: ObservableObject {
             }
             return
         }
+        // This runs on every pen report -- potentially 100+ Hz while
+        // drawing -- so skip the frontmostApplication IPC call and binding
+        // lookup entirely unless a button actually changed state.
+        guard buttons != previousPenButtons else { return }
+
         let frontmostBundleID = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
         let bindings = bindingStore.bindings(for: frontmostBundleID, kind: .penButton, count: buttons.count)
 
@@ -109,8 +119,6 @@ public final class DriverController: ObservableObject {
             }
         }
         previousPenButtons = buttons
-        if buttons != lastPenButtons {
-            DispatchQueue.main.async { self.lastPenButtons = buttons }
-        }
+        DispatchQueue.main.async { self.lastPenButtons = buttons }
     }
 }

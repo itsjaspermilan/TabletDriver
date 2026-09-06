@@ -25,25 +25,30 @@ public final class CursorPoster {
     }
 
     public func post(pen: PenReport, at point: CGPoint) {
-        let shouldBeDown = pen.pressure > clickThreshold
         let button: CGMouseButton = pen.eraser ? .right : .left
-
-        if shouldBeDown != isDown {
-            isDown = shouldBeDown
-            let type: CGEventType = shouldBeDown
-                ? (pen.eraser ? .rightMouseDown : .leftMouseDown)
-                : (pen.eraser ? .rightMouseUp : .leftMouseUp)
-            postEvent(type: type, at: point, button: button)
-        } else {
-            let type: CGEventType = isDown
-                ? (pen.eraser ? .rightMouseDragged : .leftMouseDragged)
-                : .mouseMoved
-            postEvent(type: type, at: point, button: button)
-        }
+        let type = nextEventType(for: pen)
+        postEvent(type: type, at: point, button: button)
     }
 
     public func reset() {
         isDown = false
+    }
+
+    /// The pure click/drag/move state-machine decision, separated from the
+    /// actual `CGEvent` side effect so it can be unit tested without
+    /// posting real system-wide events.
+    func nextEventType(for pen: PenReport) -> CGEventType {
+        let shouldBeDown = pen.pressure > clickThreshold
+
+        if shouldBeDown != isDown {
+            isDown = shouldBeDown
+            return shouldBeDown
+                ? (pen.eraser ? .rightMouseDown : .leftMouseDown)
+                : (pen.eraser ? .rightMouseUp : .leftMouseUp)
+        }
+        return isDown
+            ? (pen.eraser ? .rightMouseDragged : .leftMouseDragged)
+            : .mouseMoved
     }
 
     private func postEvent(type: CGEventType, at point: CGPoint, button: CGMouseButton) {

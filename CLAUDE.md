@@ -41,7 +41,11 @@ If asked to "add support for tablet X," follow
    `PenReport.x`/`.y`/`.pressure` to `0...1` in `parsePenReport` — nothing
    else in the driver deals in raw device units.
 5. Register the new profile in `TabletProfileRegistry.all`.
-6. Build (`scripts/package-app.sh`), install
+6. Write `Tests/TabletDriverKitTests/YourTabletProfileTests.swift` (copy
+   `DecoMini7V2ProfileTests`'s structure), run `swift test`, and make sure
+   it passes before touching real hardware -- it's what actually proves
+   the byte-offset reasoning, independent of the physical device.
+7. Build (`scripts/package-app.sh`), install
    (`cp -R build/TabletDriver.app /Applications/`), and verify against the
    Settings → Test Area tab before declaring it done.
 

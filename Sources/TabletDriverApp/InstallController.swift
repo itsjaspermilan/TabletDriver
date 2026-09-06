@@ -4,10 +4,6 @@ import ServiceManagement
 /// Registers/unregisters this app as a login item (the "service install")
 /// via `SMAppService.mainApp`, and handles full teardown for "Uninstall".
 enum InstallController {
-    static var isRegistered: Bool {
-        SMAppService.mainApp.status == .enabled
-    }
-
     static func install() throws {
         if SMAppService.mainApp.status != .enabled {
             try SMAppService.mainApp.register()

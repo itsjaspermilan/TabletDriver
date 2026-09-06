@@ -76,6 +76,20 @@ and choose **Open** once to run it. See [Releases](../../releases) for the
 latest build, or build from source above if you'd rather not deal with
 that dance.
 
+## Testing
+
+```bash
+swift test
+```
+
+Runs `Tests/TabletDriverKitTests` — unit tests for report parsing
+(`TabletProfile` implementations), binding persistence, screen-coordinate
+mapping, and the click-emulation state machine. These are pure-logic tests
+with no HID hardware or system permissions required, so they run the same
+in CI as locally. Please add tests for new `TabletProfile`s the same way
+`DecoMini7V2ProfileTests` does (known input bytes → expected parsed
+values) — see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Uninstall
 
 Use the app's menu bar "Uninstall…" item, or run `scripts/uninstall.sh` if

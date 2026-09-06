@@ -77,7 +77,9 @@ public final class BindingStore: ObservableObject {
     }
 
     public func addAppContext(_ bundleIdentifier: String) {
-        guard !bundleIdentifier.isEmpty, contexts[bundleIdentifier] == nil else { return }
+        guard !bundleIdentifier.isEmpty,
+              bundleIdentifier != Self.defaultContext,
+              contexts[bundleIdentifier] == nil else { return }
         contexts[bundleIdentifier] = [:]
         appContextOrder.append(bundleIdentifier)
         save()

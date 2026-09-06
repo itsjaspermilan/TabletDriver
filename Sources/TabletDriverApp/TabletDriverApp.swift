@@ -36,7 +36,7 @@ struct TabletDriverApp: App {
                 try? InstallController.install()
             }
             if hasPermissions {
-                Text(driver.isConnected ? "Deco mini7 V2 connected" : "Waiting for tablet…")
+                Text(driver.isConnected ? "\(driver.activeProfile?.name ?? "Tablet") connected" : "Waiting for tablet…")
                 Divider()
                 Button("Settings…") {
                     openSettingsWindow()

@@ -104,14 +104,24 @@ public static let all: [TabletProfile] = [
 ]
 ```
 
-## 6. Test it
+## 6. Write unit tests for the parsing logic
+
+Add `Tests/TabletDriverKitTests/YourTabletProfileTests.swift` following
+`DecoMini7V2ProfileTests` — construct a few known byte arrays by hand
+(pick simple values you can compute the expected normalized result for)
+and assert `parsePenReport`/`parseAuxReport`/`isOutOfRange`/`isAuxReport`
+return what you expect. Run with `swift test`. This is what actually
+proves your byte-offset reasoning is right, independent of whether the
+physical tablet happens to behave the way you assumed.
+
+## 7. Test it against the real hardware
 
 Rebuild, launch, and open Settings → Test Area. Move the pen and confirm
 position/pressure/tilt update live and correctly, then press each express
 key and pen button and confirm the right dot lights up. This is the same
 tool used to validate the original Deco mini7 V2 support.
 
-## 7. Send a pull request
+## 8. Send a pull request
 
 One profile per PR is easiest to review. Mention which OTD config (if any)
 you ported from, or how you reverse-engineered the layout if not.

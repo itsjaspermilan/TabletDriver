@@ -25,7 +25,13 @@ public final class ScreenMapper {
 
     /// `x`/`y` are already normalized 0...1 (see `PenReport`).
     public func map(x: Double, y: Double) -> CGPoint {
-        let rect = currentRect()
+        Self.map(x: x, y: y, into: currentRect())
+    }
+
+    /// The pure coordinate math, separated from `currentRect()`'s system
+    /// calls so it can be unit tested without depending on real display
+    /// state (which a headless CI runner may not have).
+    static func map(x: Double, y: Double, into rect: CGRect) -> CGPoint {
         let nx = x.clamped(to: 0...1)
         let ny = y.clamped(to: 0...1)
         return CGPoint(
