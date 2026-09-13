@@ -7,13 +7,17 @@ repository.
 
 A fully native Swift macOS menu-bar driver for graphics tablets (no .NET,
 no vendor SDKs), currently supporting the XP-Pen Deco mini7 V2. It's an
-open-source alternative to vendor tablet drivers. Read [README.md](README.md)
-for features and the known pressure-sensitivity limitation before
-proposing anything related to pressure — real per-app graduated pressure
-was already investigated at length and found to require an Apple-gated
-entitlement (`com.apple.developer.hid.virtual.device`) that isn't
-self-assignable; don't re-attempt CGEvent-based tricks for this without
-reading that section first.
+open-source alternative to vendor tablet drivers. Real per-app graduated
+pressure sensitivity (Affinity, Photoshop, etc.) already works — read
+[README.md](README.md)'s "Pressure sensitivity" section and
+`CursorPoster.swift`'s doc comment before touching anything pressure-related.
+The short version: it needs `CGEventField.mouseEventSubtype` set (in the
+right order) plus a spoofed Wacom capability mask on the proximity event,
+ported from OpenTabletDriver's `0.6.x` branch (not `master`/`avalonia`,
+which don't have this fix). A virtual HID device was also investigated and
+confirmed blocked by a restricted, non-self-assignable Apple entitlement —
+don't re-suggest that path, it's a dead end that the CGEvent-subtype
+approach above turned out not to need anyway.
 
 ## Most common task: adding a new tablet
 
@@ -59,8 +63,9 @@ If asked to "add support for tablet X," follow
   dispatching raw reports to whichever profile matched.
 - `Sources/TabletDriverKit/Output/` — `ScreenMapper` (tablet-area → screen
   coordinates, works in normalized 0...1 space), `CursorPoster` (CGEvent
-  cursor/click emulation), `ShortcutExecutor` (express-key/pen-button
-  action execution).
+  cursor/click emulation *and* real per-app pressure sensitivity —
+  read its doc comment before changing anything here), `ShortcutExecutor`
+  (express-key/pen-button action execution).
 - `Sources/TabletDriverKit/Mapping/BindingStore.swift` — persisted
   per-app express-key/pen-button bindings.
 - `Sources/TabletDriverKit/DriverController.swift` — wires HID input to
@@ -115,6 +120,17 @@ These cost real time to discover the first time; don't rediscover them:
   the main thread indefinitely in this project's history. Omit `step`
   unless you actually need discrete increments, and if you do, keep the
   number of steps small.
+- **When reading a reference project's source (e.g. OpenTabletDriver) to
+  port a technique, check which branch its actual releases are cut from,
+  not just `master`/the default branch.** OTD's real releases come from a
+  `0.6.x` branch; `master`/`avalonia` are an in-progress rewrite that is
+  missing real fixes (including the macOS pressure-sensitivity one this
+  project needed). Reading only the default branch produced a confident,
+  fully-researched, *wrong* conclusion earlier in this project's history.
+- **`CGEvent` tablet fields must be set in the right order.** Fields are
+  stored in a type/subtype-determined union; setting
+  `CGEventField.mouseEventSubtype` *after* the other tablet fields
+  silently drops them. Set subtype first. See `CursorPoster.swift`.
 
 ## Code style
 

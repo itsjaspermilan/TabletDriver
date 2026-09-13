@@ -101,6 +101,10 @@ public final class DeviceMonitor {
         let usagePage = IOHIDDeviceGetProperty(device, kIOHIDPrimaryUsagePageKey as CFString) as? Int ?? -1
         logger.log("device matched: \(product, privacy: .public) (\(profile.name, privacy: .public)), usagePage=\(UInt32(bitPattern: Int32(usagePage)), format: .hex)")
 
+        // Real per-app pressure turned out not to depend on seize state at
+        // all -- it needed the correct CGEvent fields (see CursorPoster).
+        // Seizing exclusively is kept since it avoids any chance of macOS's
+        // own generic HID pipeline fighting over cursor position.
         let seizeResult = IOHIDDeviceOpen(device, IOOptionBits(kIOHIDOptionsTypeSeizeDevice))
         logger.log("IOHIDDeviceOpen (seize) result=\(seizeResult)")
         guard seizeResult == kIOReturnSuccess else { return }

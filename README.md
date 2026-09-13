@@ -11,8 +11,9 @@ tablet doesn't require touching the driver's core — see
 
 ## Features
 
-- Cursor movement + click emulation (pressure crossing a configurable
-  threshold registers as a click — see "Known limitation" below).
+- Cursor movement + genuine graduated pressure sensitivity (brush size/
+  opacity in Affinity, Photoshop, etc. respond continuously to pressure,
+  not just an on/off click threshold — see "Pressure sensitivity" below).
 - Configurable express-key and pen-button bindings, including per-app
   overrides (e.g. different bindings in Photoshop vs. Illustrator).
 - Map the tablet's active area to a specific display, or to whichever app
@@ -23,21 +24,37 @@ tablet doesn't require touching the driver's core — see
   standalone `scripts/uninstall.sh` for cleanup if the app itself is
   already gone.
 
-## Known limitation: pressure sensitivity
+## Pressure sensitivity
 
-Cursor movement and click-from-pressure work reliably. Genuine graduated
-pressure (e.g. brush size scaling continuously with pressure in
-Affinity/Photoshop) was investigated and found to require macOS's HID
-digitizer pipeline via a virtual HID device — which needs the restricted
-`com.apple.developer.hid.virtual.device` entitlement. This was confirmed
-blocked (both the classic `IOHIDUserDeviceCreateWithProperties` API and
-CoreHID's modern `HIDVirtualDevice` equivalent returned `nil` without it) —
-Apple grants this only to specific approved developers/vendors, not
-self-assignable by a personal signing identity. This matches
+Real per-app graduated pressure took real effort to get right, so it's
+worth documenting how it actually works. macOS's native tablet-pointer
+`CGEvent` mechanism can carry genuine pressure/tilt on an ordinary
+mouse-type event, but two things have to be true for Adobe-class apps
+(Affinity, Photoshop, etc.) to trust it:
+
+1. `CGEventField.mouseEventSubtype` must be set to mark the event as a
+   tablet point/proximity event *before* any other tablet field is set —
+   fields live in a type/subtype-determined union, so setting them in the
+   wrong order silently drops the values.
+2. The proximity event must carry a Wacom-specific capability bitmask and
+   a stable nonzero device ID. Per-app support for third-party (non-Wacom)
+   tablet pressure on macOS is inconsistent enough that Adobe-class apps
+   apparently gate real pressure recognition on seeing this mask — see
+   `CursorPoster.swift`'s doc comment for the exact bits and why.
+
+This was ported from a real fix in
 [OpenTabletDriver](https://github.com/OpenTabletDriver/OpenTabletDriver)'s
-own known limitation on macOS. Getting real pressure would require
-enrolling in the paid Apple Developer Program and requesting that
-entitlement from Apple, with no guarantee of approval.
+`0.6.x` release branch (PR #3761, "Fix support for pressure sensitivity in
+Adobe software on macOS") — note that OTD's `master`/`avalonia` branches
+(an in-progress rewrite) do *not* contain this fix, only the `0.6.x`
+branch actual releases are cut from; two earlier attempts in this
+project's history failed because they were based on reading the wrong
+branch. A virtual HID device (the "textbook correct" approach) was also
+investigated and confirmed blocked by the restricted
+`com.apple.developer.hid.virtual.device` entitlement (both the classic
+`IOHIDUserDeviceCreateWithProperties` API and CoreHID's modern
+`HIDVirtualDevice` returned `nil` without it) — the CGEvent-subtype
+approach above turned out to not need it at all.
 
 ## Credits
 
@@ -50,6 +67,7 @@ CGEvent posting approach are ported from
 - `OpenTabletDriver.Configurations/Parsers/**` — input report byte layouts.
 - `OpenTabletDriver.UX.MacOS/PermissionHelper.cs` — Input Monitoring / Accessibility permission check-and-request pattern.
 - `OpenTabletDriver.Desktop/Interop/Input/{MacOSAbsolutePointer,MacOSVirtualMouse}.cs` — absolute cursor movement + click emulation via CGEvent.
+- `OpenTabletDriver.Desktop/Interop/Input/MacOSVirtualMouse.cs` on the `0.6.x` branch specifically (PR #3761) — the `mouseEventSubtype`/Wacom-capability-mask technique behind real pressure sensitivity.
 
 ## Building
 
