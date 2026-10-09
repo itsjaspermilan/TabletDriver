@@ -9,7 +9,7 @@ set -euo pipefail
 # (created by Xcode against the user's Apple ID) over ad-hoc "-" signing.
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BUNDLE_ID="com.tabletdriver.app"
+BUNDLE_ID="com.itsjaspermilan.TabletDriver"
 APP_NAME="TabletDriver"
 APP_BUNDLE="$ROOT_DIR/build/$APP_NAME.app"
 

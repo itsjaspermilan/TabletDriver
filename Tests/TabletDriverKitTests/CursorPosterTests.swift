@@ -43,4 +43,22 @@ final class CursorPosterTests: XCTestCase {
         // Strictly greater-than semantics: exactly-at-threshold stays up.
         XCTAssertEqual(poster.nextEventType(for: pen(pressure: 0.1)), .mouseMoved)
     }
+
+    func testLeavingRangeWhileDownReleasesTheClick() {
+        let poster = CursorPoster(clickThreshold: 0.1)
+        _ = poster.nextEventType(for: pen(pressure: 0.5))
+        XCTAssertEqual(poster.rangeExitEventType(), .leftMouseUp)
+    }
+
+    func testLeavingRangeWithEraserDownReleasesRightClick() {
+        let poster = CursorPoster(clickThreshold: 0.1)
+        _ = poster.nextEventType(for: pen(pressure: 0.5, eraser: true))
+        XCTAssertEqual(poster.rangeExitEventType(), .rightMouseUp)
+    }
+
+    func testLeavingRangeWhileUpDoesNothing() {
+        let poster = CursorPoster(clickThreshold: 0.1)
+        _ = poster.nextEventType(for: pen(pressure: 0.05))
+        XCTAssertNil(poster.rangeExitEventType())
+    }
 }

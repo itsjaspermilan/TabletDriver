@@ -13,6 +13,7 @@ public final class DeviceMonitor {
     public var onAuxReport: ((AuxReport) -> Void)?
     public var onDeviceConnected: ((TabletProfile) -> Void)?
     public var onDeviceDisconnected: (() -> Void)?
+    public var onPenOutOfRange: (() -> Void)?
 
     private let profiles: [TabletProfile]
     private var manager: IOHIDManager?
@@ -53,7 +54,18 @@ public final class DeviceMonitor {
         IOHIDManagerRegisterDeviceMatchingCallback(manager, deviceMatchedCallback, context)
         IOHIDManagerRegisterDeviceRemovalCallback(manager, deviceRemovedCallback, context)
 
-        IOHIDManagerScheduleWithRunLoop(manager, CFRunLoopGetMain(), CFRunLoopMode.defaultMode.rawValue)
+        // `.commonModes`, not `.defaultMode`: AppKit switches the main run
+        // loop to `.eventTrackingRunLoopMode` for the duration of any mouse
+        // button press anywhere in the frontmost app (even one we posted
+        // ourselves), and a source scheduled only on `.defaultMode` goes
+        // completely silent for as long as that tracking session lasts.
+        // That starved our own HID input callback the instant a click
+        // began, so no further tablet reports -- including the one meant
+        // to release that same click -- could be processed until a real
+        // mouse click elsewhere ended the tracking session from outside;
+        // IOKit keeps queuing reports underneath regardless, so everything
+        // backed up during the freeze then played back in a rapid burst.
+        IOHIDManagerScheduleWithRunLoop(manager, CFRunLoopGetMain(), CFRunLoopMode.commonModes.rawValue)
         let openResult = IOHIDManagerOpen(manager, IOOptionBits(kIOHIDOptionsTypeNone))
         logger.log("IOHIDManagerOpen result=\(openResult)")
 
@@ -115,7 +127,7 @@ public final class DeviceMonitor {
 
         let context = Unmanaged.passUnretained(self).toOpaque()
         IOHIDDeviceRegisterInputReportCallback(device, buffer, bufferLength, inputReportCallback, context)
-        IOHIDDeviceScheduleWithRunLoop(device, CFRunLoopGetMain(), CFRunLoopMode.defaultMode.rawValue)
+        IOHIDDeviceScheduleWithRunLoop(device, CFRunLoopGetMain(), CFRunLoopMode.commonModes.rawValue)
 
         logger.log("registered input report callback, buffer length=\(bufferLength)")
         onDeviceConnected?(profile)
@@ -154,6 +166,7 @@ public final class DeviceMonitor {
         }
 
         if profile.isOutOfRange(raw) {
+            onPenOutOfRange?()
             return
         }
         if profile.isAuxReport(raw) {

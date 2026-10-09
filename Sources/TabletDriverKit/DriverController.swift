@@ -48,6 +48,9 @@ public final class DriverController: ObservableObject {
                 self?.cursorPoster.reset()
             }
         }
+        monitor.onPenOutOfRange = { [weak self] in
+            self?.cursorPoster.penDidLeaveRange()
+        }
         monitor.onPenReport = { [weak self] pen in
             guard let self else { return }
             let point = self.screenMapper.map(x: pen.x, y: pen.y)

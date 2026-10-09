@@ -1,9 +1,12 @@
 import SwiftUI
 import TabletDriverKit
 
-/// Draws straight from the raw HID pen data -- bypassing the OS cursor and
-/// click emulation entirely -- so you can confirm the tablet is reporting
-/// position and graduated pressure independent of any other app.
+/// Shows live pressure/position readouts whenever the real system cursor
+/// happens to be over the canvas below -- and otherwise leaves the cursor
+/// and click emulation completely alone, so moving the pen (or trackpad)
+/// anywhere else keeps behaving like the regular cursor. This only reads
+/// `driver.lastPenReport`; it never touches `CursorPoster`/`DriverController`
+/// output, so there's nothing here that can get the real cursor stuck.
 struct PressureTestView: View {
     @ObservedObject var driver: DriverController
 
@@ -11,6 +14,8 @@ struct PressureTestView: View {
     @State private var history: [Double] = []
     @State private var peak = 0.0
     @State private var isDrawing = false
+    @State private var canvasScreenFrame: CGRect = .zero
+    @State private var isHoveringCanvas = false
 
     private struct Sample {
         let point: CGPoint
@@ -21,16 +26,6 @@ struct PressureTestView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("Pressure Test").font(.largeTitle.weight(.bold))
-                Spacer()
-                Button("Clear") {
-                    strokes.removeAll()
-                    peak = 0
-                }
-                .glassButton()
-            }
-
             GlassContainer {
                 HStack(alignment: .top, spacing: 16) {
                     canvas
@@ -42,12 +37,23 @@ struct PressureTestView: View {
         .padding(.top, 8)
         .padding(.bottom, 28)
         .onReceive(driver.$lastPenReport) { pen in
-            guard let pen else { return }
+            isHoveringCanvas = canvasScreenFrame.contains(NSEvent.mouseLocation)
+            guard isHoveringCanvas, let pen else { return }
             handle(pen)
+        }
+        .navigationTitle("Pressure Test")
+        .toolbar {
+            ToolbarItem {
+                Button("Clear") {
+                    strokes.removeAll()
+                    peak = 0
+                }
+            }
         }
     }
 
-    private var pressure: Double { driver.lastPenReport?.pressure ?? 0 }
+    private var pressure: Double { isHoveringCanvas ? (driver.lastPenReport?.pressure ?? 0) : 0 }
+    private var hoveredPenReport: PenReport? { isHoveringCanvas ? driver.lastPenReport : nil }
 
     private var canvas: some View {
         Canvas { context, size in
@@ -65,7 +71,7 @@ struct PressureTestView: View {
                 }
             }
 
-            if let pen = driver.lastPenReport {
+            if let pen = hoveredPenReport {
                 let center = CGPoint(x: pen.x * size.width, y: pen.y * size.height)
                 let radius = 6 + pen.pressure * 14
                 context.stroke(
@@ -81,7 +87,7 @@ struct PressureTestView: View {
             if strokes.isEmpty {
                 VStack(spacing: 6) {
                     Image(systemName: "scribble.variable").font(.largeTitle)
-                    Text("Draw with the pen")
+                    Text(isHoveringCanvas ? "Draw with the pen" : "Move the cursor here to test")
                         .font(.headline)
                     Text("Press lightly, then harder — line width follows pressure.")
                         .font(.callout)
@@ -92,6 +98,7 @@ struct PressureTestView: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .glassCard()
+        .background(ScreenFrameReader(screenFrame: $canvasScreenFrame))
     }
 
     private var sidePanel: some View {
@@ -120,9 +127,9 @@ struct PressureTestView: View {
 
             Divider()
 
-            readoutRow("Position", driver.lastPenReport.map { String(format: "%.0f%%, %.0f%%", $0.x * 100, $0.y * 100) } ?? "--")
-            readoutRow("Tilt", driver.lastPenReport.map { "\($0.tiltX)°, \($0.tiltY)°" } ?? "--")
-            readoutRow("Eraser", driver.lastPenReport?.eraser == true ? "Active" : "--")
+            readoutRow("Position", hoveredPenReport.map { String(format: "%.0f%%, %.0f%%", $0.x * 100, $0.y * 100) } ?? "--")
+            readoutRow("Tilt", hoveredPenReport.map { "\($0.tiltX)°, \($0.tiltY)°" } ?? "--")
+            readoutRow("Eraser", hoveredPenReport?.eraser == true ? "Active" : "--")
             VStack(alignment: .leading, spacing: 6) {
                 Text("Pen buttons").font(.caption).foregroundStyle(.secondary)
                 buttonDots(driver.lastPenButtons)
@@ -216,6 +223,25 @@ struct PressureTestView: View {
             strokes[strokes.count - 1].append(sample)
         } else {
             isDrawing = false
+        }
+    }
+}
+
+/// Reports the on-screen frame (`NSEvent.mouseLocation`'s coordinate space)
+/// of whatever it's attached to as a background, so `PressureTestView` can
+/// tell whether the real cursor is currently over its canvas.
+private struct ScreenFrameReader: NSViewRepresentable {
+    @Binding var screenFrame: CGRect
+
+    func makeNSView(context: Context) -> NSView {
+        NSView()
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async {
+            guard let window = nsView.window else { return }
+            let windowRect = nsView.convert(nsView.bounds, to: nil)
+            screenFrame = window.convertToScreen(windowRect)
         }
     }
 }

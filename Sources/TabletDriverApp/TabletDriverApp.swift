@@ -5,7 +5,7 @@ import os
 
 private let appLogger = Logger(subsystem: "com.tabletdriver.app", category: "lifecycle")
 
-let bundleIdentifier = Bundle.main.bundleIdentifier ?? "com.tabletdriver.app"
+let bundleIdentifier = Bundle.main.bundleIdentifier ?? "com.itsjaspermilan.TabletDriver"
 
 let applicationSupportDirectory: URL = {
     let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
@@ -102,7 +102,12 @@ struct TabletDriverApp: App {
             defer: false
         )
         window.titlebarAppearsTransparent = true
-        window.titleVisibility = resizable ? .hidden : .visible
+        // Each page sets its own `.navigationTitle`, which `NSHostingView`
+        // bridges into this window's real titlebar/toolbar automatically
+        // (its `sceneBridgingOptions` defaults to `.all` as the contentView)
+        // -- that's what actually produces the native floating Liquid Glass
+        // toolbar. Hiding the title here would hide that too.
+        window.titleVisibility = .visible
         window.center()
         window.title = title
         window.contentView = NSHostingView(rootView: content())

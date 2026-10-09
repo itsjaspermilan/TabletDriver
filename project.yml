@@ -1,6 +1,6 @@
 name: TabletDriver
 options:
-  bundleIdPrefix: com.tabletdriver
+  bundleIdPrefix: com.itsjaspermilan
   deploymentTarget:
     macOS: "14.0"
 settings:
@@ -15,6 +15,16 @@ targets:
     type: library.static
     platform: macOS
     sources: [Sources/TabletDriverKit]
+    settings:
+      base:
+        # Xcode's synthesized "Copy Swift Objective-C Interface Header" script
+        # phase for this static library target uses `ditto` to overwrite its
+        # output in CONFIGURATION_BUILD_DIR. Script sandboxing only grants
+        # write access to that literal destination file, not its containing
+        # directory, so overwriting it on any rebuild after the first fails
+        # with "Operation not permitted". Disable sandboxing for this target
+        # to avoid it.
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
   TabletDriverApp:
     type: application
     platform: macOS
@@ -36,7 +46,7 @@ targets:
     settings:
       base:
         PRODUCT_NAME: TabletDriver
-        PRODUCT_BUNDLE_IDENTIFIER: com.tabletdriver.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.itsjaspermilan.TabletDriver
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_HARDENED_RUNTIME: YES
         GENERATE_INFOPLIST_FILE: NO

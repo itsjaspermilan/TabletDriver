@@ -38,5 +38,6 @@ struct AboutPage: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(28)
+        .navigationTitle("About")
     }
 }

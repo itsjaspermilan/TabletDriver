@@ -33,6 +33,7 @@ struct OnboardingView: View {
                             detail: "Reads pen and button data from the tablet",
                             symbol: "dot.radiowaves.left.and.right",
                             granted: hasInputMonitoring,
+                            note: hasInputMonitoring ? nil : "If TabletDriver isn't listed in the settings page that opens, click + and add it yourself, then enable its checkbox.",
                             action: { PermissionManager.requestInputMonitoringAccess() }
                         )
                         permissionRow(
@@ -40,6 +41,7 @@ struct OnboardingView: View {
                             detail: "Moves the cursor and presses shortcuts",
                             symbol: "accessibility",
                             granted: hasAccessibility,
+                            note: nil,
                             action: { PermissionManager.requestAccessibilityAccess() }
                         )
                     }
@@ -58,24 +60,32 @@ struct OnboardingView: View {
         }
     }
 
-    private func permissionRow(title: String, detail: String, symbol: String, granted: Bool, action: @escaping () -> Void) -> some View {
-        HStack(spacing: 14) {
-            Image(systemName: symbol)
-                .font(.title2)
-                .foregroundStyle(.tint)
-                .frame(width: 32)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.headline)
-                Text(detail).font(.callout).foregroundStyle(.secondary)
-            }
-            Spacer()
-            if granted {
-                Image(systemName: "checkmark.circle.fill")
+    private func permissionRow(title: String, detail: String, symbol: String, granted: Bool, note: String?, action: @escaping () -> Void) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 14) {
+                Image(systemName: symbol)
                     .font(.title2)
-                    .foregroundStyle(.green)
-            } else {
-                Button("Grant…", action: action)
-                    .glassButton(prominent: true)
+                    .foregroundStyle(.tint)
+                    .frame(width: 32)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title).font(.headline)
+                    Text(detail).font(.callout).foregroundStyle(.secondary)
+                }
+                Spacer()
+                if granted {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(.green)
+                } else {
+                    Button("Grant…", action: action)
+                        .glassButton(prominent: true)
+                }
+            }
+            if let note {
+                Text(note)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.leading, 46)
             }
         }
         .padding(16)

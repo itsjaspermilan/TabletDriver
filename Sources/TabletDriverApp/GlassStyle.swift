@@ -20,18 +20,10 @@ extension View {
 
     @ViewBuilder
     func glassButton(prominent: Bool = false) -> some View {
-        if #available(macOS 26, *) {
-            if prominent {
-                self.buttonStyle(.glassProminent)
-            } else {
-                self.buttonStyle(.glass)
-            }
+        if prominent {
+            self.buttonStyle(.borderedProminent)
         } else {
-            if prominent {
-                self.buttonStyle(.borderedProminent)
-            } else {
-                self.buttonStyle(.bordered)
-            }
+            self.buttonStyle(.bordered)
         }
     }
 }
@@ -71,6 +63,11 @@ struct AmbientBackground: View {
                 .blur(radius: 100)
                 .offset(x: -40, y: 260)
         }
+        // These blurred circles get recomposited every frame of the
+        // sidebar's open/close animation otherwise, which is expensive
+        // enough to visibly stutter the animation -- flatten them into one
+        // rasterized layer instead so the animation only moves a bitmap.
+        .drawingGroup()
         .ignoresSafeArea()
     }
 }
@@ -104,9 +101,6 @@ struct PageScaffold<Content: View>: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text(title)
-                    .font(.largeTitle.weight(.bold))
-                    .padding(.bottom, 4)
                 content
             }
             .padding(.horizontal, 28)
@@ -114,5 +108,6 @@ struct PageScaffold<Content: View>: View {
             .padding(.bottom, 28)
         }
         .scrollContentBackground(.hidden)
+        .navigationTitle(title)
     }
 }

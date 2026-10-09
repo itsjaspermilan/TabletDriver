@@ -5,7 +5,7 @@ set -uo pipefail
 # (or won't launch) and its own in-app "Uninstall..." button can't run.
 # Safe to run repeatedly / when nothing is installed.
 
-BUNDLE_ID="com.tabletdriver.app"
+BUNDLE_ID="com.itsjaspermilan.TabletDriver"
 APP_SUPPORT_DIR="$HOME/Library/Application Support/TabletDriver"
 
 echo "==> Unregistering login item (if registered)"
