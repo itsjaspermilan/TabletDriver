@@ -1,0 +1,19 @@
+{
+  "fill": {
+    "linear-gradient": ["display-p3:0.22,0.15,0.55,1.0", "display-p3:0.03,0.03,0.10,1.0"]
+  },
+  "groups": [
+    {
+      "layers": [
+        {
+          "glass": true,
+          "image-name": "stroke.svg",
+          "name": "stroke"
+        }
+      ],
+      "shadow": { "kind": "layer-color", "opacity": 0.6 },
+      "translucency": { "enabled": true, "value": 0.35 }
+    }
+  ],
+  "supported-platforms": { "squares": ["macOS"] }
+}

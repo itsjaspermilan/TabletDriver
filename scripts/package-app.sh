@@ -48,9 +48,12 @@ rm -rf "$APP_BUNDLE"
 mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
 cp "$BINARY_PATH" "$APP_BUNDLE/Contents/MacOS/TabletDriverApp"
 
-if [ -f "$ROOT_DIR/Resources/AppIcon.icns" ]; then
-    cp "$ROOT_DIR/Resources/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
-fi
+echo "==> Compiling Liquid Glass icon (Resources/AppIcon.icon)"
+xcrun actool "$ROOT_DIR/Resources/AppIcon.icon" \
+    --compile "$APP_BUNDLE/Contents/Resources" \
+    --platform macosx --minimum-deployment-target 14.0 \
+    --app-icon AppIcon \
+    --output-partial-info-plist /dev/null >/dev/null
 
 cat > "$APP_BUNDLE/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -64,6 +67,8 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<PLIST
     <key>CFBundleName</key>
     <string>$APP_NAME</string>
     <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIconName</key>
     <string>AppIcon</string>
     <key>CFBundleShortVersionString</key>
     <string>$VERSION</string>
