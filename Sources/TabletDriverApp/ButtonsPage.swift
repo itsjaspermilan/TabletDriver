@@ -3,7 +3,7 @@ import SwiftUI
 import TabletDriverKit
 
 struct ButtonsPage: View {
-    @ObservedObject var driver: DriverController
+    let driver: DriverController
     // `driver.bindingStore` is its own ObservableObject nested inside
     // `driver` -- its @Published changes don't propagate through `driver`'s
     // own observation, so this view needs to observe it directly or rows

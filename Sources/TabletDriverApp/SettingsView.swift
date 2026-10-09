@@ -25,7 +25,7 @@ final class SettingsNavigator: ObservableObject {
 }
 
 struct SettingsView: View {
-    @ObservedObject var driver: DriverController
+    let driver: DriverController
     @ObservedObject private var navigator = SettingsNavigator.shared
 
     var body: some View {
@@ -39,6 +39,12 @@ struct SettingsView: View {
             }
             .listStyle(.sidebar)
             .navigationSplitViewColumnWidth(min: 170, ideal: 190, max: 220)
+            // The sidebar never needs to collapse -- it's a fixed list of
+            // 4 pages, not responsive content -- so the system's automatic
+            // collapse toggle is pure overhead: it's the stray arrow that
+            // flashes in the toolbar and the thing animating/re-laying-out
+            // the toolbar on every sidebar width change.
+            .toolbar(removing: .sidebarToggle)
         } detail: {
             ZStack {
                 AmbientBackground()

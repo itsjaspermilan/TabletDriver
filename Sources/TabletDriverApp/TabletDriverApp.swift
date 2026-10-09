@@ -14,7 +14,7 @@ let applicationSupportDirectory: URL = {
 
 @main
 struct TabletDriverApp: App {
-    @StateObject private var driver = DriverController(
+    @State private var driver = DriverController(
         applicationSupportDirectory: applicationSupportDirectory
     )
     @State private var hasPermissions = PermissionManager.hasAllPermissions

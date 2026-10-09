@@ -3,7 +3,7 @@ import Foundation
 /// A single pen sample, in device-agnostic normalized units so the rest of
 /// the driver (cursor mapping, click emulation, the test canvas) never
 /// needs to know which tablet is actually connected.
-public struct PenReport {
+public struct PenReport: Equatable {
     /// 0...1 across the tablet's active area.
     public let x: Double
     /// 0...1 across the tablet's active area.

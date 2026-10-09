@@ -2,7 +2,7 @@ import SwiftUI
 import TabletDriverKit
 
 struct OverviewPage: View {
-    @ObservedObject var driver: DriverController
+    let driver: DriverController
     @State private var clickThresholdPercent: Double
     @State private var mappingSelection: MappingChoice
     @State private var launchAtLogin = InstallController.isEnabled

@@ -1,16 +1,25 @@
 import AppKit
 import CoreGraphics
 import Foundation
+import Observation
 
 /// Wires the HID layer to the output layer: pen reports become cursor
 /// moves/clicks, aux/pen-button reports become mapped actions (using
 /// whichever app is currently frontmost to pick a per-app override).
-public final class DriverController: ObservableObject {
-    @Published public private(set) var isConnected = false
-    @Published public private(set) var activeProfile: TabletProfile?
-    @Published public private(set) var lastPenReport: PenReport?
-    @Published public private(set) var lastAuxButtons: [Bool] = []
-    @Published public private(set) var lastPenButtons: [Bool] = []
+///
+/// `@Observable` (not `ObservableObject`) so views only invalidate on the
+/// specific properties they read -- important here since `lastPenReport`
+/// changes at pen-report rate (~100Hz while drawing); `ObservableObject`'s
+/// coarse `objectWillChange` would otherwise re-render every view holding
+/// a reference to this controller on every single report.
+@MainActor
+@Observable
+public final class DriverController {
+    public private(set) var isConnected = false
+    public private(set) var activeProfile: TabletProfile?
+    public private(set) var lastPenReport: PenReport?
+    public private(set) var lastAuxButtons: [Bool] = []
+    public private(set) var lastPenButtons: [Bool] = []
 
     public let bindingStore: BindingStore
     public let preferences: DriverPreferences

@@ -8,7 +8,7 @@ import TabletDriverKit
 /// `driver.lastPenReport`; it never touches `CursorPoster`/`DriverController`
 /// output, so there's nothing here that can get the real cursor stuck.
 struct PressureTestView: View {
-    @ObservedObject var driver: DriverController
+    let driver: DriverController
 
     @State private var strokes: [[Sample]] = []
     @State private var history: [Double] = []
@@ -16,6 +16,7 @@ struct PressureTestView: View {
     @State private var isDrawing = false
     @State private var canvasScreenFrame: CGRect = .zero
     @State private var isHoveringCanvas = false
+    @State private var hoverPoint: CGPoint?
 
     private struct Sample {
         let point: CGPoint
@@ -36,10 +37,15 @@ struct PressureTestView: View {
         .padding(.horizontal, 28)
         .padding(.top, 8)
         .padding(.bottom, 28)
-        .onReceive(driver.$lastPenReport) { pen in
-            isHoveringCanvas = canvasScreenFrame.contains(NSEvent.mouseLocation)
-            guard isHoveringCanvas, let pen else { return }
-            handle(pen)
+        .onChange(of: driver.lastPenReport) { _, pen in
+            let mouseLocation = NSEvent.mouseLocation
+            isHoveringCanvas = canvasScreenFrame.contains(mouseLocation)
+            guard isHoveringCanvas, let pen, let point = canvasRelativePoint(for: mouseLocation) else {
+                hoverPoint = nil
+                return
+            }
+            hoverPoint = point
+            handle(pen, at: point)
         }
         .navigationTitle("Pressure Test")
         .toolbar {
@@ -71,9 +77,9 @@ struct PressureTestView: View {
                 }
             }
 
-            if let pen = hoveredPenReport {
-                let center = CGPoint(x: pen.x * size.width, y: pen.y * size.height)
-                let radius = 6 + pen.pressure * 14
+            if let hoverPoint {
+                let center = CGPoint(x: hoverPoint.x * size.width, y: hoverPoint.y * size.height)
+                let radius = 6 + pressure * 14
                 context.stroke(
                     Path(ellipseIn: CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2)),
                     with: .color(.white.opacity(0.8)),
@@ -209,12 +215,26 @@ struct PressureTestView: View {
         Color(hue: 0.55 + 0.4 * level, saturation: 0.7, brightness: 1)
     }
 
-    private func handle(_ pen: PenReport) {
+    /// `pen.x`/`.y` are normalized across the *whole* tablet, which
+    /// `ScreenMapper` maps onto the whole screen/active window -- not onto
+    /// this canvas. Deriving the point from where the real cursor actually
+    /// landed on screen (relative to the canvas' own frame) is what makes
+    /// the drawn stroke track 1:1 with the pen instead of being scaled
+    /// against the entire tablet area.
+    private func canvasRelativePoint(for mouseLocation: NSPoint) -> CGPoint? {
+        guard canvasScreenFrame.width > 0, canvasScreenFrame.height > 0 else { return nil }
+        let x = (mouseLocation.x - canvasScreenFrame.minX) / canvasScreenFrame.width
+        // NSEvent.mouseLocation is bottom-left-origin; Canvas draws top-down.
+        let y = 1 - (mouseLocation.y - canvasScreenFrame.minY) / canvasScreenFrame.height
+        return CGPoint(x: x, y: y)
+    }
+
+    private func handle(_ pen: PenReport, at point: CGPoint) {
         history.append(pen.pressure)
         if history.count > historyLength { history.removeFirst(history.count - historyLength) }
         peak = max(peak, pen.pressure)
 
-        let sample = Sample(point: CGPoint(x: pen.x, y: pen.y), pressure: pen.pressure)
+        let sample = Sample(point: point, pressure: pen.pressure)
         if pen.pressure > 0 {
             if !isDrawing {
                 strokes.append([])
