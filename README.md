@@ -85,6 +85,20 @@ Input Monitoring/Accessibility TCC grants — see CONTRIBUTING.md for why
 this matters if you're developing locally). Move it to `/Applications` and
 launch it.
 
+### Xcode project
+
+The project is generated from `project.yml` with [XcodeGen](https://github.com/yonaskolb/XcodeGen)
+(`brew install xcodegen`), so there's no `.xcodeproj` to merge-conflict:
+
+```bash
+xcodegen && open TabletDriver.xcodeproj
+```
+
+It builds the same sources as `Package.swift`, with the Liquid Glass icon,
+automatic signing and the unit tests wired up. Change `DEVELOPMENT_TEAM` in
+`project.yml` to your own team ID. `scripts/package-app.sh` and
+`swift test` keep working unchanged.
+
 ### Sharing a build
 
 ```bash
