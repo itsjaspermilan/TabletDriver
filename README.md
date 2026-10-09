@@ -18,7 +18,7 @@ tablet doesn't require touching the driver's core — see
   overrides (e.g. different bindings in Photoshop vs. Illustrator).
 - Map the tablet's active area to a specific display, or to whichever app
   window is currently frontmost.
-- A Test Area to confirm the tablet is being read correctly, independent of
+- A Pressure Test page to confirm the tablet is being read correctly, independent of
   any other app.
 - Install/uninstall via a real macOS login item (`SMAppService`), with a
   standalone `scripts/uninstall.sh` for cleanup if the app itself is
@@ -85,14 +85,26 @@ Input Monitoring/Accessibility TCC grants — see CONTRIBUTING.md for why
 this matters if you're developing locally). Move it to `/Applications` and
 launch it.
 
-### Getting a pre-built copy instead of building
+### Sharing a build
 
-This project is not notarized (that needs a paid Apple Developer Program
-membership), so a pre-built `.app` someone shares with you will still show
-Gatekeeper's "cannot verify this app" warning — right-click it in Finder
-and choose **Open** once to run it. See [Releases](../../releases) for the
-latest build, or build from source above if you'd rather not deal with
-that dance.
+```bash
+VERSION=1.1 scripts/package-release.sh
+```
+
+Produces `build/TabletDriver-1.1.dmg` and `.zip` that anyone on an Apple
+Silicon Mac (macOS 14+) can install. Without a paid "Developer ID
+Application" identity the build is ad-hoc signed, so the recipient has to
+approve it once:
+
+1. Drag TabletDriver into Applications and try to open it.
+2. Open **System Settings → Privacy & Security**, scroll down, and click
+   **Open Anyway** (or run `xattr -cr /Applications/TabletDriver.app` in
+   Terminal before the first launch).
+3. Grant Input Monitoring and Accessibility when prompted.
+
+With a Developer ID identity in your keychain the script uses it
+automatically, and setting `NOTARY_PROFILE=<notarytool keychain profile>`
+also notarizes and staples it so recipients see no warning at all.
 
 ## Testing
 

@@ -1,20 +1,37 @@
 import Foundation
 import ServiceManagement
 
-/// Registers/unregisters this app as a login item (the "service install")
-/// via `SMAppService.mainApp`, and handles full teardown for "Uninstall".
+/// Registers/unregisters this app as a login item via `SMAppService.mainApp`,
+/// and handles full teardown for "Uninstall".
 enum InstallController {
-    static func install() throws {
-        if SMAppService.mainApp.status != .enabled {
-            try SMAppService.mainApp.register()
+    private static let firstRunKey = "didConfigureLoginItem"
+
+    static var isEnabled: Bool {
+        SMAppService.mainApp.status == .enabled
+    }
+
+    static func setEnabled(_ enabled: Bool) {
+        if enabled {
+            try? SMAppService.mainApp.register()
+        } else {
+            try? SMAppService.mainApp.unregister()
         }
     }
 
+    /// Enables launch-at-login once on first run only, so turning it off in
+    /// Settings isn't silently undone at the next launch.
+    static func installOnFirstRun() {
+        guard !UserDefaults.standard.bool(forKey: firstRunKey) else { return }
+        UserDefaults.standard.set(true, forKey: firstRunKey)
+        setEnabled(true)
+    }
+
     static func uninstall(applicationSupportDirectory: URL, bundleIdentifier: String) {
-        if SMAppService.mainApp.status == .enabled {
+        if isEnabled {
             try? SMAppService.mainApp.unregister()
         }
         try? FileManager.default.removeItem(at: applicationSupportDirectory)
+        UserDefaults.standard.removeObject(forKey: firstRunKey)
         resetTCCGrants(bundleIdentifier: bundleIdentifier)
     }
 

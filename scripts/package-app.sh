@@ -13,7 +13,13 @@ BUNDLE_ID="com.tabletdriver.app"
 APP_NAME="TabletDriver"
 APP_BUNDLE="$ROOT_DIR/build/$APP_NAME.app"
 
-SIGN_IDENTITY="$(security find-identity -v -p codesigning | grep -m1 'Apple Development' | awk -F'"' '{print $2}')"
+VERSION="${VERSION:-1.0}"
+
+# SIGN_IDENTITY can be set by the caller (scripts/package-release.sh does);
+# "-" means ad-hoc.
+if [ -z "${SIGN_IDENTITY:-}" ]; then
+    SIGN_IDENTITY="$(security find-identity -v -p codesigning | grep -m1 'Apple Development' | awk -F'"' '{print $2}' || true)"
+fi
 if [ -z "$SIGN_IDENTITY" ]; then
     echo "WARNING: no 'Apple Development' identity found; falling back to ad-hoc signing." >&2
     echo "         Input Monitoring/Accessibility grants may not persist. Open Xcode once" >&2
@@ -60,7 +66,9 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<PLIST
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
+    <string>$VERSION</string>
+    <key>CFBundleVersion</key>
+    <string>$VERSION</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>LSMinimumSystemVersion</key>
@@ -72,7 +80,7 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<PLIST
 PLIST
 
 echo "==> Codesigning with stable identifier"
-codesign --force --deep --sign "$SIGN_IDENTITY" --identifier "$BUNDLE_ID" "$APP_BUNDLE"
+codesign --force --deep --options runtime --sign "$SIGN_IDENTITY" --identifier "$BUNDLE_ID" "$APP_BUNDLE"
 
 echo "==> Gatekeeper assessment"
 spctl -a -vv "$APP_BUNDLE" || echo "(rejected -- expected for a non-notarized personal build; launching it directly still works)"

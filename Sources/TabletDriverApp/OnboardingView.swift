@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 import TabletDriverKit
 
@@ -9,28 +10,47 @@ struct OnboardingView: View {
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Tablet Driver needs two permissions to receive input from the tablet and move the cursor.")
-                .font(.headline)
+        ZStack {
+            AmbientBackground()
+            VStack(spacing: 20) {
+                if let icon = NSApplication.shared.applicationIconImage {
+                    Image(nsImage: icon)
+                        .resizable()
+                        .frame(width: 84, height: 84)
+                        .shadow(color: .black.opacity(0.3), radius: 12, y: 6)
+                }
+                VStack(spacing: 4) {
+                    Text("Welcome to TabletDriver").font(.title2.weight(.bold))
+                    Text("Two permissions are needed to read your tablet and move the cursor.")
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
 
-            permissionRow(
-                title: "Input Monitoring",
-                granted: hasInputMonitoring,
-                action: { PermissionManager.requestInputMonitoringAccess() }
-            )
+                GlassContainer {
+                    VStack(spacing: 12) {
+                        permissionRow(
+                            title: "Input Monitoring",
+                            detail: "Reads pen and button data from the tablet",
+                            symbol: "dot.radiowaves.left.and.right",
+                            granted: hasInputMonitoring,
+                            action: { PermissionManager.requestInputMonitoringAccess() }
+                        )
+                        permissionRow(
+                            title: "Accessibility",
+                            detail: "Moves the cursor and presses shortcuts",
+                            symbol: "accessibility",
+                            granted: hasAccessibility,
+                            action: { PermissionManager.requestAccessibilityAccess() }
+                        )
+                    }
+                }
 
-            permissionRow(
-                title: "Accessibility",
-                granted: hasAccessibility,
-                action: { PermissionManager.requestAccessibilityAccess() }
-            )
-
-            Spacer()
-            Text("This window updates automatically once both permissions are granted in System Settings.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                Text("This window updates automatically once both are granted in System Settings.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(28)
         }
-        .padding(24)
         .onReceive(timer) { _ in
             hasInputMonitoring = PermissionManager.hasInputMonitoringAccess()
             hasAccessibility = PermissionManager.hasAccessibilityAccess()
@@ -38,15 +58,27 @@ struct OnboardingView: View {
         }
     }
 
-    private func permissionRow(title: String, granted: Bool, action: @escaping () -> Void) -> some View {
-        HStack {
-            Image(systemName: granted ? "checkmark.circle.fill" : "exclamationmark.circle")
-                .foregroundStyle(granted ? .green : .orange)
-            Text(title)
+    private func permissionRow(title: String, detail: String, symbol: String, granted: Bool, action: @escaping () -> Void) -> some View {
+        HStack(spacing: 14) {
+            Image(systemName: symbol)
+                .font(.title2)
+                .foregroundStyle(.tint)
+                .frame(width: 32)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.headline)
+                Text(detail).font(.callout).foregroundStyle(.secondary)
+            }
             Spacer()
-            if !granted {
+            if granted {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.green)
+            } else {
                 Button("Grant…", action: action)
+                    .glassButton(prominent: true)
             }
         }
+        .padding(16)
+        .glassCard(cornerRadius: 18)
     }
 }

@@ -89,7 +89,7 @@ public struct YourTabletProfile: TabletProfile {
 
 `parsePenReport` must return `PenReport.x`/`.y`/`.pressure` already
 normalized to `0...1` (divide by your `maxX`/`maxY`/`maxPressure`) — the
-rest of the driver (cursor mapping, click emulation, the Test Area) is
+rest of the driver (cursor mapping, click emulation, the Pressure Test page) is
 written entirely in normalized terms and doesn't know or care which
 tablet is connected.
 
@@ -116,7 +116,7 @@ physical tablet happens to behave the way you assumed.
 
 ## 7. Test it against the real hardware
 
-Rebuild, launch, and open Settings → Test Area. Move the pen and confirm
+Rebuild, launch, and open Settings → Pressure Test. Move the pen and confirm
 position/pressure/tilt update live and correctly, then press each express
 key and pen button and confirm the right dot lights up. This is the same
 tool used to validate the original Deco mini7 V2 support.

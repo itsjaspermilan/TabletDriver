@@ -51,7 +51,7 @@ If asked to "add support for tablet X," follow
    the byte-offset reasoning, independent of the physical device.
 7. Build (`scripts/package-app.sh`), install
    (`cp -R build/TabletDriver.app /Applications/`), and verify against the
-   Settings → Test Area tab before declaring it done.
+   Settings → Pressure Test page before declaring it done.
 
 ## Architecture map
 

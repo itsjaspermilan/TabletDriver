@@ -33,13 +33,16 @@ struct TabletDriverApp: App {
                 guard !hasStartedDriver, hasPermissions else { return }
                 hasStartedDriver = true
                 driver.start()
-                try? InstallController.install()
+                InstallController.installOnFirstRun()
             }
             if hasPermissions {
                 Text(driver.isConnected ? "\(driver.activeProfile?.name ?? "Tablet") connected" : "Waiting for tablet…")
                 Divider()
                 Button("Settings…") {
-                    openSettingsWindow()
+                    openSettingsWindow(page: .overview)
+                }
+                Button("Pressure Test…") {
+                    openSettingsWindow(page: .pressureTest)
                 }
                 Button("Uninstall…") {
                     InstallController.uninstall(applicationSupportDirectory: applicationSupportDirectory, bundleIdentifier: bundleIdentifier)
@@ -61,7 +64,7 @@ struct TabletDriverApp: App {
             guard granted, !hasStartedDriver else { return }
             hasStartedDriver = true
             driver.start()
-            try? InstallController.install()
+            InstallController.installOnFirstRun()
         }
     }
 
@@ -71,18 +74,19 @@ struct TabletDriverApp: App {
     }
 
     private func openOnboardingWindow() {
-        showWindow(id: "onboarding", title: "Tablet Driver Setup", size: NSSize(width: 480, height: 360)) {
+        showWindow(id: "onboarding", title: "TabletDriver Setup", size: NSSize(width: 480, height: 440)) {
             OnboardingView(hasPermissions: $hasPermissions)
         }
     }
 
-    private func openSettingsWindow() {
-        showWindow(id: "settings", title: "Tablet Driver Settings", size: NSSize(width: 460, height: 420)) {
+    private func openSettingsWindow(page: SettingsPage) {
+        SettingsNavigator.shared.page = page
+        showWindow(id: "settings", title: "TabletDriver", size: NSSize(width: 900, height: 620), resizable: true) {
             SettingsView(driver: driver)
         }
     }
 
-    private func showWindow(id: String, title: String, size: NSSize, @ViewBuilder content: () -> some View) {
+    private func showWindow(id: String, title: String, size: NSSize, resizable: Bool = false, @ViewBuilder content: () -> some View) {
         if let existing = WindowRetainer.shared.window(for: id) {
             NSApp.activate(ignoringOtherApps: true)
             existing.makeKeyAndOrderFront(nil)
@@ -91,10 +95,14 @@ struct TabletDriverApp: App {
 
         let window = NSWindow(
             contentRect: NSRect(origin: .zero, size: size),
-            styleMask: [.titled, .closable],
+            styleMask: resizable
+                ? [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
+                : [.titled, .closable, .miniaturizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = resizable ? .hidden : .visible
         window.center()
         window.title = title
         window.contentView = NSHostingView(rootView: content())

@@ -1,92 +1,133 @@
 #!/usr/bin/swift
 import AppKit
 import CoreGraphics
+import CoreImage
 
-// Renders a Liquid-Glass-style app icon: a rounded-squircle base with a
-// vibrant gradient, a soft frosted-glass highlight layer, and a pencil
-// glyph -- approximating macOS 26's Liquid Glass material (a true Icon
-// Composer .icon asset isn't scriptable from the command line, so this is
-// a static-PNG visual approximation of the same look).
+// Renders the app icon: a dark glass tile with a glowing, pressure-tapered
+// ink stroke (thin -> thick -> thin, like a pen pressed harder mid-stroke).
+// Usage: generate-icon.swift [output.png]   (writes a 1024x1024 PNG)
 
-let size = 1024.0
-let rect = CGRect(x: 0, y: 0, width: size, height: size)
+let canvas = 1024
+let colorSpace = CGColorSpace(name: CGColorSpace.sRGB)!
 
-let image = NSImage(size: NSSize(width: size, height: size))
-image.lockFocus()
-guard let ctx = NSGraphicsContext.current?.cgContext else { fatalError("no context") }
+func makeContext() -> CGContext {
+    CGContext(
+        data: nil, width: canvas, height: canvas, bitsPerComponent: 8, bytesPerRow: 0,
+        space: colorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+    )!
+}
 
-// macOS squircle mask (superellipse-ish rounded rect, ~22% corner radius).
-let cornerRadius = size * 0.225
-let squircle = CGPath(roundedRect: rect, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil)
-ctx.addPath(squircle)
+func color(_ r: Double, _ g: Double, _ b: Double, _ a: Double = 1) -> CGColor {
+    CGColor(colorSpace: colorSpace, components: [r, g, b, a])!
+}
+
+func blurred(_ image: CGImage, radius: Double) -> CGImage {
+    let ci = CIImage(cgImage: image)
+    let out = ci.clampedToExtent().applyingFilter("CIGaussianBlur", parameters: [kCIInputRadiusKey: radius]).cropped(to: ci.extent)
+    return CIContext().createCGImage(out, from: ci.extent)!
+}
+
+let tile = CGRect(x: 100, y: 100, width: 824, height: 824)
+let tilePath = CGPath(roundedRect: tile, cornerWidth: 186, cornerHeight: 186, transform: nil)
+
+func strokeOutline() -> CGPath {
+    let p0 = CGPoint(x: 245, y: 330), c1 = CGPoint(x: 330, y: 760)
+    let c2 = CGPoint(x: 560, y: 820), p3 = CGPoint(x: 790, y: 700)
+    func point(_ t: Double) -> CGPoint {
+        let u = 1 - t
+        return CGPoint(
+            x: u*u*u*p0.x + 3*u*u*t*c1.x + 3*u*t*t*c2.x + t*t*t*p3.x,
+            y: u*u*u*p0.y + 3*u*u*t*c1.y + 3*u*t*t*c2.y + t*t*t*p3.y
+        )
+    }
+    let steps = 400
+    let path = CGMutablePath()
+    for i in 0...steps {
+        let t = Double(i) / Double(steps)
+        let radius = 2 + 52 * pow(sin(Double.pi * t), 1.1)
+        let p = point(t)
+        path.addEllipse(in: CGRect(x: p.x - radius, y: p.y - radius, width: radius * 2, height: radius * 2))
+    }
+    return path
+}
+
+func gradientFill(_ ctx: CGContext, path: CGPath) {
+    ctx.saveGState()
+    ctx.addPath(path)
+    ctx.clip()
+    let g = CGGradient(colorsSpace: colorSpace, colors: [
+        color(0.10, 0.85, 1.0), color(0.45, 0.50, 1.0), color(0.95, 0.30, 0.85)
+    ] as CFArray, locations: [0, 0.5, 1])!
+    ctx.drawLinearGradient(g, start: CGPoint(x: 245, y: 330), end: CGPoint(x: 790, y: 720), options: [])
+    ctx.restoreGState()
+}
+
+let ctx = makeContext()
+
+ctx.saveGState()
+ctx.setShadow(offset: CGSize(width: 0, height: -14), blur: 28, color: color(0, 0, 0, 0.45))
+ctx.addPath(tilePath)
+ctx.setFillColor(color(0.05, 0.05, 0.12))
+ctx.fillPath()
+ctx.restoreGState()
+
+ctx.saveGState()
+ctx.addPath(tilePath)
 ctx.clip()
 
-// Base vibrant gradient (blue -> violet), typical of macOS 26 system app icons.
-let colors = [
-    NSColor(calibratedRed: 0.20, green: 0.47, blue: 0.98, alpha: 1.0).cgColor,
-    NSColor(calibratedRed: 0.46, green: 0.29, blue: 0.95, alpha: 1.0).cgColor
-] as CFArray
-let gradient = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: colors, locations: [0, 1])!
-ctx.drawLinearGradient(
-    gradient,
-    start: CGPoint(x: 0, y: size),
-    end: CGPoint(x: size, y: 0),
-    options: []
+let background = CGGradient(colorsSpace: colorSpace, colors: [
+    color(0.16, 0.12, 0.42), color(0.05, 0.05, 0.14), color(0.03, 0.03, 0.08)
+] as CFArray, locations: [0, 0.55, 1])!
+ctx.drawRadialGradient(
+    background, startCenter: CGPoint(x: 330, y: 840), startRadius: 0,
+    endCenter: CGPoint(x: 330, y: 840), endRadius: 900, options: [.drawsAfterEndLocation]
 )
 
-// Frosted-glass highlight: a large soft white ellipse across the top half,
-// blurred, at low opacity -- the signature Liquid Glass "sheen".
-let glassLayer = NSImage(size: NSSize(width: size, height: size))
-glassLayer.lockFocus()
-if let glassCtx = NSGraphicsContext.current?.cgContext {
-    glassCtx.setFillColor(NSColor.white.withAlphaComponent(0.55).cgColor)
-    let ellipse = CGRect(x: size * 0.05, y: size * 0.50, width: size * 0.90, height: size * 0.55)
-    glassCtx.fillEllipse(in: ellipse)
-}
-glassLayer.unlockFocus()
+var centering = CGAffineTransform(translationX: 512, y: 512).scaledBy(x: 1.18, y: 1.18).translatedBy(x: -515, y: -585)
+let outline = strokeOutline().copy(using: &centering)!
+let glowLayer = makeContext()
+gradientFill(glowLayer, path: outline)
+let glowImage = glowLayer.makeImage()!
+ctx.setBlendMode(.plusLighter)
+ctx.draw(blurred(glowImage, radius: 46), in: CGRect(x: 0, y: 0, width: canvas, height: canvas))
+ctx.setAlpha(0.6)
+ctx.draw(blurred(glowImage, radius: 14), in: CGRect(x: 0, y: 0, width: canvas, height: canvas))
+ctx.setAlpha(1)
+ctx.setBlendMode(.normal)
 
-if let tiff = glassLayer.tiffRepresentation, let ciImage = CIImage(data: tiff) {
-    let blurred = ciImage.applyingFilter("CIGaussianBlur", parameters: [kCIInputRadiusKey: size * 0.05])
-    let ciContext = CIContext()
-    if let cgBlurred = ciContext.createCGImage(blurred, from: ciImage.extent) {
-        ctx.saveGState()
-        ctx.setAlpha(0.5)
-        ctx.draw(cgBlurred, in: rect)
-        ctx.restoreGState()
-    }
-}
+gradientFill(ctx, path: outline)
 
-// Subtle inner top-edge highlight stroke for a glassy rim.
-ctx.addPath(squircle)
-ctx.setStrokeColor(NSColor.white.withAlphaComponent(0.35).cgColor)
-ctx.setLineWidth(size * 0.01)
-ctx.strokePath()
+ctx.saveGState()
+ctx.addPath(outline)
+ctx.clip()
+let sheen = CGGradient(colorsSpace: colorSpace, colors: [
+    color(1, 1, 1, 0.55), color(1, 1, 1, 0)
+] as CFArray, locations: [0, 1])!
+ctx.drawLinearGradient(sheen, start: CGPoint(x: 0, y: 860), end: CGPoint(x: 0, y: 560), options: [])
+ctx.restoreGState()
 
-// Pencil glyph, white, centered.
-let symbolConfig = NSImage.SymbolConfiguration(pointSize: size * 0.42, weight: .medium)
-if let symbol = NSImage(systemSymbolName: "pencil.and.outline", accessibilityDescription: nil)?
-    .withSymbolConfiguration(symbolConfig) {
-    let tinted = NSImage(size: symbol.size)
-    tinted.lockFocus()
-    NSColor.white.set()
-    let symbolRect = CGRect(origin: .zero, size: symbol.size)
-    symbol.draw(in: symbolRect)
-    symbolRect.fill(using: .sourceAtop)
-    tinted.unlockFocus()
+let glass = CGGradient(colorsSpace: colorSpace, colors: [
+    color(1, 1, 1, 0.16), color(1, 1, 1, 0)
+] as CFArray, locations: [0, 1])!
+ctx.drawLinearGradient(glass, start: CGPoint(x: 0, y: 924), end: CGPoint(x: 0, y: 520), options: [])
 
-    let drawSize = CGSize(width: size * 0.5, height: size * 0.5 * (symbol.size.height / symbol.size.width))
-    let origin = CGPoint(x: (size - drawSize.width) / 2, y: (size - drawSize.height) / 2)
-    tinted.draw(in: CGRect(origin: origin, size: drawSize))
-}
+ctx.restoreGState()
 
-image.unlockFocus()
+let rimLayer = makeContext()
+rimLayer.addPath(tilePath)
+rimLayer.clip()
+rimLayer.addPath(tilePath)
+rimLayer.setLineWidth(6)
+rimLayer.replacePathWithStrokedPath()
+rimLayer.clip()
+let rim = CGGradient(colorsSpace: colorSpace, colors: [
+    color(1, 1, 1, 0.65), color(1, 1, 1, 0.05), color(1, 1, 1, 0.2)
+] as CFArray, locations: [0, 0.6, 1])!
+rimLayer.drawLinearGradient(rim, start: CGPoint(x: 0, y: 924), end: CGPoint(x: 0, y: 100), options: [])
+ctx.draw(rimLayer.makeImage()!, in: CGRect(x: 0, y: 0, width: canvas, height: canvas))
 
-guard let tiff = image.tiffRepresentation,
-      let bitmap = NSBitmapImageRep(data: tiff),
-      let png = bitmap.representation(using: .png, properties: [:]) else {
-    fatalError("failed to render icon PNG")
-}
-
+let rep = NSBitmapImageRep(cgImage: ctx.makeImage()!)
+let png = rep.representation(using: .png, properties: [:])!
 let outputPath = CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : "icon-1024.png"
 try! png.write(to: URL(fileURLWithPath: outputPath))
 print("Wrote \(outputPath)")
