@@ -1,0 +1,738 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00F551002E3B25FD7725E49D /* CursorPoster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AB0D6945C2E4C421753F340 /* CursorPoster.swift */; };
+		08BEDE0813DEBA5A5A1CC295 /* DriverPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821360FEBC010CF7C5E7AB55 /* DriverPreferences.swift */; };
+		0A469ACF0D40151A1EC63BDD /* TabletProfileRegistryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A93DCD2CDE8F7764E73655C /* TabletProfileRegistryTests.swift */; };
+		0F785A1B52FF50E6449950EA /* ShortcutRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332B2A575B8A94601B9AB6BA /* ShortcutRecorder.swift */; };
+		106E9CEA5ED23E4CCDBCCAEA /* BindingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC50B1B280BF5C406EC5189 /* BindingStore.swift */; };
+		1CD2C32E1578851AF6663154 /* BindingStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A653F7A76EF069ED3BDB9B97 /* BindingStoreTests.swift */; };
+		1FE859554367B75279A17639 /* CursorPosterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B9B30F4535831C9166FA7B /* CursorPosterTests.swift */; };
+		23E766C84C639B7D4400A515 /* PressureTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A73ADB862A1D98163599B599 /* PressureTestView.swift */; };
+		2A94A334ED53765E11DA329D /* TabletDriverApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725141724FCA579A2BD0E9A7 /* TabletDriverApp.swift */; };
+		3E02084C65A9866EAB63F9DB /* libTabletDriverKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CFDFCA25F16846B09299999 /* libTabletDriverKit.a */; };
+		46906A9A7AAA270B5295B6AC /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = CE0F6C2A7F44C0FDC83FF39A /* AppIcon.icon */; };
+		487A53936A021314A740C5EF /* KeyCodeNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF109CE13C854F4120C78BB /* KeyCodeNames.swift */; };
+		67C776FDEE0DAA16353791A0 /* PenReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4F47982C6BC20AB563C654 /* PenReport.swift */; };
+		83E9493BADA22BAEDE5A9B64 /* DecoMini7V2Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AAC6C2E5DBACD2CEFC410D /* DecoMini7V2Profile.swift */; };
+		85728D39B473E2B632A154F4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D90F49601439B940A51F3F /* SettingsView.swift */; };
+		95A6805BABDE71C696680638 /* AboutPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3E7146C99F870DCE489611B /* AboutPage.swift */; };
+		982CD09C1838C2E519878E64 /* ScreenMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7102C4C6DF2502FE7C677B8 /* ScreenMapperTests.swift */; };
+		A09B074646A57E7B250113FF /* TabletProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B20B6262F58D12FDFBAF459 /* TabletProfile.swift */; };
+		B61CE5A2F5214EC97A3A7C74 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B7883AA813CB16CC3375F36 /* OnboardingView.swift */; };
+		B829A72F541B01597BBFB67E /* OverviewPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBEE4696BEA3834DA4C73DAD /* OverviewPage.swift */; };
+		BA3C2B38B33A77DECE6F9947 /* KeyCodeNamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390AAB26A965F925245C1933 /* KeyCodeNamesTests.swift */; };
+		BC0A42A50F2F1AA15BBB28C5 /* GlassStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB9814253F0D87AE246065A /* GlassStyle.swift */; };
+		C2E06B1101240C266547BDF8 /* AuxReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0728E8FC3340FEA5464267 /* AuxReport.swift */; };
+		C6F047E8E8806B88CD272031 /* DriverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A999B21341E3C9366B9D0E76 /* DriverController.swift */; };
+		CD722341FE640D30CA77EA12 /* ScreenMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5B1979250D80DAB303CA14 /* ScreenMapper.swift */; };
+		D24661D587A3894240E3E9E6 /* ShortcutExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE02608D08D20BAC320483A3 /* ShortcutExecutor.swift */; };
+		D4095F348A44630B120EF934 /* ButtonsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32D7C7E335ED747FC88B42C /* ButtonsPage.swift */; };
+		DAC9C51EBFF395D8AEFA4497 /* DeviceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 025AAEA2CB1A4AC12CB2574A /* DeviceMonitor.swift */; };
+		DDB3CA9E117CA2BC90A33BC5 /* libTabletDriverKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CFDFCA25F16846B09299999 /* libTabletDriverKit.a */; };
+		DE39365BA96AA724E5090003 /* PermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69901BE3EFABAAFFD0A776A8 /* PermissionManager.swift */; };
+		E39AA290047F5EF028B21C47 /* TabletProfileRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66D6752A36B0C97D3DABBB76 /* TabletProfileRegistry.swift */; };
+		E739697B0878ED45392A89A1 /* DecoMini7V2ProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57750F6DAF3FC56FD4FE0FF /* DecoMini7V2ProfileTests.swift */; };
+		EA245EBEDCBDE5EF42A6E961 /* DriverPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E94CBE4E36C8E238A746183 /* DriverPreferencesTests.swift */; };
+		EFA2A3932492BDC92010F78C /* InstallController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C35E3DB80B43023A0B9381B /* InstallController.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		189087F96F94C9E7DD5FAD42 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 89AB9A2D8967338CEB7B7331 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 611323B8BA415D4136CA6944;
+			remoteInfo = TabletDriverKit;
+		};
+		8A91D1B686145E973E6E8FE2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 89AB9A2D8967338CEB7B7331 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 611323B8BA415D4136CA6944;
+			remoteInfo = TabletDriverKit;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		025AAEA2CB1A4AC12CB2574A /* DeviceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceMonitor.swift; sourceTree = "<group>"; };
+		0B20B6262F58D12FDFBAF459 /* TabletProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabletProfile.swift; sourceTree = "<group>"; };
+		0B7883AA813CB16CC3375F36 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		16AAC6C2E5DBACD2CEFC410D /* DecoMini7V2Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoMini7V2Profile.swift; sourceTree = "<group>"; };
+		1C35E3DB80B43023A0B9381B /* InstallController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallController.swift; sourceTree = "<group>"; };
+		332B2A575B8A94601B9AB6BA /* ShortcutRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorder.swift; sourceTree = "<group>"; };
+		390AAB26A965F925245C1933 /* KeyCodeNamesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyCodeNamesTests.swift; sourceTree = "<group>"; };
+		44662E31D7FED07199BA924B /* TabletDriver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TabletDriver.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		49ABDA781233402B9DECFA62 /* TabletDriverKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TabletDriverKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CFDFCA25F16846B09299999 /* libTabletDriverKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTabletDriverKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		56B9B30F4535831C9166FA7B /* CursorPosterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorPosterTests.swift; sourceTree = "<group>"; };
+		5B5B1979250D80DAB303CA14 /* ScreenMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenMapper.swift; sourceTree = "<group>"; };
+		66D6752A36B0C97D3DABBB76 /* TabletProfileRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabletProfileRegistry.swift; sourceTree = "<group>"; };
+		69901BE3EFABAAFFD0A776A8 /* PermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManager.swift; sourceTree = "<group>"; };
+		6AB0D6945C2E4C421753F340 /* CursorPoster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorPoster.swift; sourceTree = "<group>"; };
+		725141724FCA579A2BD0E9A7 /* TabletDriverApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabletDriverApp.swift; sourceTree = "<group>"; };
+		7C4F47982C6BC20AB563C654 /* PenReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PenReport.swift; sourceTree = "<group>"; };
+		821360FEBC010CF7C5E7AB55 /* DriverPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriverPreferences.swift; sourceTree = "<group>"; };
+		8A93DCD2CDE8F7764E73655C /* TabletProfileRegistryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabletProfileRegistryTests.swift; sourceTree = "<group>"; };
+		8E94CBE4E36C8E238A746183 /* DriverPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriverPreferencesTests.swift; sourceTree = "<group>"; };
+		A57750F6DAF3FC56FD4FE0FF /* DecoMini7V2ProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoMini7V2ProfileTests.swift; sourceTree = "<group>"; };
+		A653F7A76EF069ED3BDB9B97 /* BindingStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BindingStoreTests.swift; sourceTree = "<group>"; };
+		A73ADB862A1D98163599B599 /* PressureTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressureTestView.swift; sourceTree = "<group>"; };
+		A999B21341E3C9366B9D0E76 /* DriverController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriverController.swift; sourceTree = "<group>"; };
+		AAF109CE13C854F4120C78BB /* KeyCodeNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyCodeNames.swift; sourceTree = "<group>"; };
+		BB0728E8FC3340FEA5464267 /* AuxReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuxReport.swift; sourceTree = "<group>"; };
+		BFB9814253F0D87AE246065A /* GlassStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassStyle.swift; sourceTree = "<group>"; };
+		CBEE4696BEA3834DA4C73DAD /* OverviewPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewPage.swift; sourceTree = "<group>"; };
+		CE02608D08D20BAC320483A3 /* ShortcutExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutExecutor.swift; sourceTree = "<group>"; };
+		CE0F6C2A7F44C0FDC83FF39A /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = AppIcon.icon; sourceTree = "<group>"; };
+		D32D7C7E335ED747FC88B42C /* ButtonsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonsPage.swift; sourceTree = "<group>"; };
+		D8D90F49601439B940A51F3F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F3E7146C99F870DCE489611B /* AboutPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutPage.swift; sourceTree = "<group>"; };
+		F7102C4C6DF2502FE7C677B8 /* ScreenMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenMapperTests.swift; sourceTree = "<group>"; };
+		FAC50B1B280BF5C406EC5189 /* BindingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BindingStore.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2E72B58D9DE8619C0027887C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3E02084C65A9866EAB63F9DB /* libTabletDriverKit.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE27B0535D2252F6DCA334F5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DDB3CA9E117CA2BC90A33BC5 /* libTabletDriverKit.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		293513D49DE0F82C662C7C23 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4CFDFCA25F16846B09299999 /* libTabletDriverKit.a */,
+				44662E31D7FED07199BA924B /* TabletDriver.app */,
+				49ABDA781233402B9DECFA62 /* TabletDriverKitTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2A733A01ED72D50239B90C31 /* TabletDriverKit */ = {
+			isa = PBXGroup;
+			children = (
+				A999B21341E3C9366B9D0E76 /* DriverController.swift */,
+				821360FEBC010CF7C5E7AB55 /* DriverPreferences.swift */,
+				98795943FC4A48411015E33F /* HID */,
+				B444E98359CA828098AF236F /* Mapping */,
+				753453E4F44951920BE8F20D /* Output */,
+				AC9FBB1A53A31665E69A5B0B /* Permissions */,
+				6FD5F80D39BFE74E1AAD4722 /* Profiles */,
+			);
+			name = TabletDriverKit;
+			path = Sources/TabletDriverKit;
+			sourceTree = "<group>";
+		};
+		2E62A68E7EC92707A7B422A0 /* TabletDriverApp */ = {
+			isa = PBXGroup;
+			children = (
+				F3E7146C99F870DCE489611B /* AboutPage.swift */,
+				D32D7C7E335ED747FC88B42C /* ButtonsPage.swift */,
+				BFB9814253F0D87AE246065A /* GlassStyle.swift */,
+				1C35E3DB80B43023A0B9381B /* InstallController.swift */,
+				0B7883AA813CB16CC3375F36 /* OnboardingView.swift */,
+				CBEE4696BEA3834DA4C73DAD /* OverviewPage.swift */,
+				A73ADB862A1D98163599B599 /* PressureTestView.swift */,
+				D8D90F49601439B940A51F3F /* SettingsView.swift */,
+				332B2A575B8A94601B9AB6BA /* ShortcutRecorder.swift */,
+				725141724FCA579A2BD0E9A7 /* TabletDriverApp.swift */,
+			);
+			name = TabletDriverApp;
+			path = Sources/TabletDriverApp;
+			sourceTree = "<group>";
+		};
+		6FD5F80D39BFE74E1AAD4722 /* Profiles */ = {
+			isa = PBXGroup;
+			children = (
+				16AAC6C2E5DBACD2CEFC410D /* DecoMini7V2Profile.swift */,
+				0B20B6262F58D12FDFBAF459 /* TabletProfile.swift */,
+				66D6752A36B0C97D3DABBB76 /* TabletProfileRegistry.swift */,
+			);
+			path = Profiles;
+			sourceTree = "<group>";
+		};
+		753453E4F44951920BE8F20D /* Output */ = {
+			isa = PBXGroup;
+			children = (
+				6AB0D6945C2E4C421753F340 /* CursorPoster.swift */,
+				5B5B1979250D80DAB303CA14 /* ScreenMapper.swift */,
+				CE02608D08D20BAC320483A3 /* ShortcutExecutor.swift */,
+			);
+			path = Output;
+			sourceTree = "<group>";
+		};
+		812152440292C3940800005D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CE0F6C2A7F44C0FDC83FF39A /* AppIcon.icon */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		8D125997D76AF9A784BE542B /* TabletDriverKitTests */ = {
+			isa = PBXGroup;
+			children = (
+				A653F7A76EF069ED3BDB9B97 /* BindingStoreTests.swift */,
+				56B9B30F4535831C9166FA7B /* CursorPosterTests.swift */,
+				A57750F6DAF3FC56FD4FE0FF /* DecoMini7V2ProfileTests.swift */,
+				8E94CBE4E36C8E238A746183 /* DriverPreferencesTests.swift */,
+				390AAB26A965F925245C1933 /* KeyCodeNamesTests.swift */,
+				F7102C4C6DF2502FE7C677B8 /* ScreenMapperTests.swift */,
+				8A93DCD2CDE8F7764E73655C /* TabletProfileRegistryTests.swift */,
+			);
+			name = TabletDriverKitTests;
+			path = Tests/TabletDriverKitTests;
+			sourceTree = "<group>";
+		};
+		8E7ABBCE0FB95D68CF12A6BD = {
+			isa = PBXGroup;
+			children = (
+				812152440292C3940800005D /* Resources */,
+				2E62A68E7EC92707A7B422A0 /* TabletDriverApp */,
+				2A733A01ED72D50239B90C31 /* TabletDriverKit */,
+				8D125997D76AF9A784BE542B /* TabletDriverKitTests */,
+				293513D49DE0F82C662C7C23 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		98795943FC4A48411015E33F /* HID */ = {
+			isa = PBXGroup;
+			children = (
+				BB0728E8FC3340FEA5464267 /* AuxReport.swift */,
+				025AAEA2CB1A4AC12CB2574A /* DeviceMonitor.swift */,
+				7C4F47982C6BC20AB563C654 /* PenReport.swift */,
+			);
+			path = HID;
+			sourceTree = "<group>";
+		};
+		AC9FBB1A53A31665E69A5B0B /* Permissions */ = {
+			isa = PBXGroup;
+			children = (
+				69901BE3EFABAAFFD0A776A8 /* PermissionManager.swift */,
+			);
+			path = Permissions;
+			sourceTree = "<group>";
+		};
+		B444E98359CA828098AF236F /* Mapping */ = {
+			isa = PBXGroup;
+			children = (
+				FAC50B1B280BF5C406EC5189 /* BindingStore.swift */,
+				AAF109CE13C854F4120C78BB /* KeyCodeNames.swift */,
+			);
+			path = Mapping;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		29A15E873D71D501FCB9DEA8 /* TabletDriverKitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 80F1C66A29C5D45FBE2AAD59 /* Build configuration list for PBXNativeTarget "TabletDriverKitTests" */;
+			buildPhases = (
+				6A1671656E3BF426B2630CF8 /* Sources */,
+				FE27B0535D2252F6DCA334F5 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F6BF86007C1EFECF0180C8A0 /* PBXTargetDependency */,
+			);
+			name = TabletDriverKitTests;
+			packageProductDependencies = (
+			);
+			productName = TabletDriverKitTests;
+			productReference = 49ABDA781233402B9DECFA62 /* TabletDriverKitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		611323B8BA415D4136CA6944 /* TabletDriverKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C14CD2FAD6FAEC9FDE096912 /* Build configuration list for PBXNativeTarget "TabletDriverKit" */;
+			buildPhases = (
+				A84B747DE936243A5AFFBCA9 /* Sources */,
+				40BD54D5552B82E9A41B6A83 /* Copy Swift Objective-C Interface Header */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TabletDriverKit;
+			packageProductDependencies = (
+			);
+			productName = TabletDriverKit;
+			productReference = 4CFDFCA25F16846B09299999 /* libTabletDriverKit.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		BED6814BE1F5806E0D91AEB1 /* TabletDriverApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F79845839E88C310B75A3F2C /* Build configuration list for PBXNativeTarget "TabletDriverApp" */;
+			buildPhases = (
+				7FFB764600B58734904198EF /* Sources */,
+				B77BBC27B368BABA8F51A3A5 /* Resources */,
+				2E72B58D9DE8619C0027887C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5FFE93C3A7FCDB95CCB08537 /* PBXTargetDependency */,
+			);
+			name = TabletDriverApp;
+			packageProductDependencies = (
+			);
+			productName = TabletDriverApp;
+			productReference = 44662E31D7FED07199BA924B /* TabletDriver.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		89AB9A2D8967338CEB7B7331 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					29A15E873D71D501FCB9DEA8 = {
+						DevelopmentTeam = T4H858M58C;
+						ProvisioningStyle = Automatic;
+					};
+					611323B8BA415D4136CA6944 = {
+						DevelopmentTeam = T4H858M58C;
+						ProvisioningStyle = Automatic;
+					};
+					BED6814BE1F5806E0D91AEB1 = {
+						DevelopmentTeam = T4H858M58C;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 5A26A3BD9B9AE159CA4CBFE1 /* Build configuration list for PBXProject "TabletDriver" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 8E7ABBCE0FB95D68CF12A6BD;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 293513D49DE0F82C662C7C23 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				611323B8BA415D4136CA6944 /* TabletDriverKit */,
+				BED6814BE1F5806E0D91AEB1 /* TabletDriverApp */,
+				29A15E873D71D501FCB9DEA8 /* TabletDriverKitTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B77BBC27B368BABA8F51A3A5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				46906A9A7AAA270B5295B6AC /* AppIcon.icon in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		40BD54D5552B82E9A41B6A83 /* Copy Swift Objective-C Interface Header */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(DERIVED_SOURCES_DIR)/$(SWIFT_OBJC_INTERFACE_HEADER_NAME)",
+			);
+			name = "Copy Swift Objective-C Interface Header";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/include/$(PRODUCT_MODULE_NAME)/$(SWIFT_OBJC_INTERFACE_HEADER_NAME)",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "ditto \"${SCRIPT_INPUT_FILE_0}\" \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6A1671656E3BF426B2630CF8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1CD2C32E1578851AF6663154 /* BindingStoreTests.swift in Sources */,
+				1FE859554367B75279A17639 /* CursorPosterTests.swift in Sources */,
+				E739697B0878ED45392A89A1 /* DecoMini7V2ProfileTests.swift in Sources */,
+				EA245EBEDCBDE5EF42A6E961 /* DriverPreferencesTests.swift in Sources */,
+				BA3C2B38B33A77DECE6F9947 /* KeyCodeNamesTests.swift in Sources */,
+				982CD09C1838C2E519878E64 /* ScreenMapperTests.swift in Sources */,
+				0A469ACF0D40151A1EC63BDD /* TabletProfileRegistryTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7FFB764600B58734904198EF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				95A6805BABDE71C696680638 /* AboutPage.swift in Sources */,
+				D4095F348A44630B120EF934 /* ButtonsPage.swift in Sources */,
+				BC0A42A50F2F1AA15BBB28C5 /* GlassStyle.swift in Sources */,
+				EFA2A3932492BDC92010F78C /* InstallController.swift in Sources */,
+				B61CE5A2F5214EC97A3A7C74 /* OnboardingView.swift in Sources */,
+				B829A72F541B01597BBFB67E /* OverviewPage.swift in Sources */,
+				23E766C84C639B7D4400A515 /* PressureTestView.swift in Sources */,
+				85728D39B473E2B632A154F4 /* SettingsView.swift in Sources */,
+				0F785A1B52FF50E6449950EA /* ShortcutRecorder.swift in Sources */,
+				2A94A334ED53765E11DA329D /* TabletDriverApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A84B747DE936243A5AFFBCA9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C2E06B1101240C266547BDF8 /* AuxReport.swift in Sources */,
+				106E9CEA5ED23E4CCDBCCAEA /* BindingStore.swift in Sources */,
+				00F551002E3B25FD7725E49D /* CursorPoster.swift in Sources */,
+				83E9493BADA22BAEDE5A9B64 /* DecoMini7V2Profile.swift in Sources */,
+				DAC9C51EBFF395D8AEFA4497 /* DeviceMonitor.swift in Sources */,
+				C6F047E8E8806B88CD272031 /* DriverController.swift in Sources */,
+				08BEDE0813DEBA5A5A1CC295 /* DriverPreferences.swift in Sources */,
+				487A53936A021314A740C5EF /* KeyCodeNames.swift in Sources */,
+				67C776FDEE0DAA16353791A0 /* PenReport.swift in Sources */,
+				DE39365BA96AA724E5090003 /* PermissionManager.swift in Sources */,
+				CD722341FE640D30CA77EA12 /* ScreenMapper.swift in Sources */,
+				D24661D587A3894240E3E9E6 /* ShortcutExecutor.swift in Sources */,
+				A09B074646A57E7B250113FF /* TabletProfile.swift in Sources */,
+				E39AA290047F5EF028B21C47 /* TabletProfileRegistry.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5FFE93C3A7FCDB95CCB08537 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 611323B8BA415D4136CA6944 /* TabletDriverKit */;
+			targetProxy = 8A91D1B686145E973E6E8FE2 /* PBXContainerItemProxy */;
+		};
+		F6BF86007C1EFECF0180C8A0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 611323B8BA415D4136CA6944 /* TabletDriverKit */;
+			targetProxy = 189087F96F94C9E7DD5FAD42 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		03366A1B8A5110F65EF55A25 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = T4H858M58C;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		1936A8DD1E220241CD166DED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = build/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.itsjaspermilan.TabletDriver;
+				PRODUCT_NAME = TabletDriver;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		2613A66C05F9F934CC9A00D4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.itsjaspermilan.TabletDriverKitTests;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		5F082C1DB6E12B84CFA0BBF6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = T4H858M58C;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		71CD088D7489B4E78F47D677 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.itsjaspermilan.TabletDriverKit;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		7F15801D8E02419770D12C81 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.itsjaspermilan.TabletDriverKitTests;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		A78F609562C36AF3BB3842F3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = build/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.itsjaspermilan.TabletDriver;
+				PRODUCT_NAME = TabletDriver;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		FE3D63BE160C19B1C5BD3F80 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.itsjaspermilan.TabletDriverKit;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5A26A3BD9B9AE159CA4CBFE1 /* Build configuration list for PBXProject "TabletDriver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				03366A1B8A5110F65EF55A25 /* Debug */,
+				5F082C1DB6E12B84CFA0BBF6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		80F1C66A29C5D45FBE2AAD59 /* Build configuration list for PBXNativeTarget "TabletDriverKitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7F15801D8E02419770D12C81 /* Debug */,
+				2613A66C05F9F934CC9A00D4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C14CD2FAD6FAEC9FDE096912 /* Build configuration list for PBXNativeTarget "TabletDriverKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				71CD088D7489B4E78F47D677 /* Debug */,
+				FE3D63BE160C19B1C5BD3F80 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F79845839E88C310B75A3F2C /* Build configuration list for PBXNativeTarget "TabletDriverApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1936A8DD1E220241CD166DED /* Debug */,
+				A78F609562C36AF3BB3842F3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 89AB9A2D8967338CEB7B7331 /* Project object */;
+}
