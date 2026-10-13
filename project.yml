@@ -34,7 +34,7 @@ targets:
     dependencies:
       - target: TabletDriverKit
     info:
-      path: build/Info.plist
+      path: Resources/Info.plist
       properties:
         CFBundleName: TabletDriver
         CFBundleDisplayName: TabletDriver
