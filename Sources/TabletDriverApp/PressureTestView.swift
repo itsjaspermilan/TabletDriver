@@ -10,6 +10,7 @@ import TabletDriverKit
 struct PressureTestView: View {
     let driver: DriverController
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var strokes: [[Sample]] = []
     @State private var history: [Double] = []
     @State private var peak = 0.0
@@ -88,7 +89,12 @@ struct PressureTestView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black.opacity(0.35), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .accessibilityLabel("Drawing canvas")
+        .accessibilityValue(strokes.isEmpty ? "Empty" : "\(strokes.count) strokes")
+        .accessibilityHint("Move the pen over this area to test pressure")
+        // Opaque enough that the placeholder text below keeps ~5:1
+        // contrast over the light-mode glass, not just the dark-mode one.
+        .background(Color.black.opacity(0.7), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay {
             if strokes.isEmpty {
                 VStack(spacing: 6) {
@@ -98,8 +104,9 @@ struct PressureTestView: View {
                     Text("Press lightly, then harder — line width follows pressure.")
                         .font(.callout)
                 }
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.white.opacity(0.7))
                 .allowsHitTesting(false)
+                .accessibilityHidden(true)
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
@@ -114,7 +121,7 @@ struct PressureTestView: View {
                 Text("\(Int(pressure * 100))%")
                     .font(.system(size: 44, weight: .bold, design: .rounded))
                     .monospacedDigit()
-                    .contentTransition(.numericText())
+                    .contentTransition(reduceMotion ? .identity : .numericText())
                 gauge
                 HStack {
                     Text("Peak \(Int(peak * 100))%")
@@ -125,25 +132,23 @@ struct PressureTestView: View {
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Pressure")
+            .accessibilityValue("\(Int(pressure * 100))%, peak \(Int(peak * 100))%, clicks at \(Int(driver.clickThreshold * 100))%")
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("Last few seconds").font(.caption).foregroundStyle(.secondary)
                 graph.frame(height: 70)
             }
+            .accessibilityHidden(true)
 
             Divider()
 
             readoutRow("Position", hoveredPenReport.map { String(format: "%.0f%%, %.0f%%", $0.x * 100, $0.y * 100) } ?? "--")
             readoutRow("Tilt", hoveredPenReport.map { "\($0.tiltX)°, \($0.tiltY)°" } ?? "--")
             readoutRow("Eraser", hoveredPenReport?.eraser == true ? "Active" : "--")
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Pen buttons").font(.caption).foregroundStyle(.secondary)
-                buttonDots(driver.lastPenButtons)
-            }
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Express keys").font(.caption).foregroundStyle(.secondary)
-                buttonDots(driver.lastAuxButtons)
-            }
+            buttonStates("Pen buttons", driver.lastPenButtons)
+            buttonStates("Express keys", driver.lastAuxButtons)
 
             Spacer(minLength: 0)
         }
@@ -159,7 +164,7 @@ struct PressureTestView: View {
                 Capsule()
                     .fill(LinearGradient(colors: [.cyan, .indigo, .pink], startPoint: .leading, endPoint: .trailing))
                     .frame(width: max(8, proxy.size.width * pressure))
-                    .animation(.easeOut(duration: 0.08), value: pressure)
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.08), value: pressure)
                 Rectangle()
                     .fill(.primary.opacity(0.6))
                     .frame(width: 2, height: 14)
@@ -201,14 +206,26 @@ struct PressureTestView: View {
         }
     }
 
-    private func buttonDots(_ states: [Bool]) -> some View {
-        HStack(spacing: 5) {
-            ForEach(0..<states.count, id: \.self) { index in
-                Circle()
-                    .fill(states[index] ? Color.accentColor : Color.primary.opacity(0.15))
-                    .frame(width: 11, height: 11)
+    private func buttonStates(_ title: String, _ states: [Bool]) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title).font(.caption).foregroundStyle(.secondary)
+            HStack(spacing: 5) {
+                ForEach(0..<states.count, id: \.self) { index in
+                    Circle()
+                        .fill(states[index] ? Color.accentColor : Color.primary.opacity(0.15))
+                        .frame(width: 11, height: 11)
+                }
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityValue(pressedDescription(states))
+    }
+
+    private func pressedDescription(_ states: [Bool]) -> String {
+        guard !states.isEmpty else { return "No tablet connected" }
+        let pressed = states.indices.filter { states[$0] }.map { String($0 + 1) }
+        return pressed.isEmpty ? "None pressed" : "\(pressed.joined(separator: ", ")) pressed"
     }
 
     private func strokeColor(_ level: Double) -> Color {

@@ -7,6 +7,7 @@ import TabletDriverKit
 final class ShortcutRecorderModel: ObservableObject {
     @Published var isRecording = false
     private var monitor: Any?
+    private static let escapeKeyCode: UInt16 = 53
 
     func startRecording(onCapture: @escaping (ExpressKeyAction) -> Void) {
         isRecording = true
@@ -19,7 +20,9 @@ final class ShortcutRecorderModel: ObservableObject {
                 event.modifierFlags.contains(.shift) ? .shift : nil
             ].compactMap { $0 }
 
-            onCapture(.keyboardShortcut(modifiers: modifiers, keyCode: event.keyCode))
+            if !(event.keyCode == Self.escapeKeyCode && modifiers.isEmpty) {
+                onCapture(.keyboardShortcut(modifiers: modifiers, keyCode: event.keyCode))
+            }
             self.stopRecording()
             return nil
         }
@@ -40,7 +43,7 @@ struct ShortcutRecorderButton: View {
     @StateObject private var recorder = ShortcutRecorderModel()
 
     var body: some View {
-        Button(recorder.isRecording ? "Press any key…" : KeyCodeNames.description(for: action)) {
+        Button(recorder.isRecording ? "Press any key… (Esc to cancel)" : KeyCodeNames.description(for: action)) {
             if recorder.isRecording {
                 recorder.stopRecording()
             } else {
@@ -50,6 +53,8 @@ struct ShortcutRecorderButton: View {
             }
         }
         .foregroundStyle(recorder.isRecording ? .orange : .primary)
+        .accessibilityValue(recorder.isRecording ? "Recording, press any key, or Escape to cancel" : KeyCodeNames.description(for: action))
+        .accessibilityHint("Records the next key press as this button's shortcut")
         .onDisappear { recorder.stopRecording() }
     }
 }

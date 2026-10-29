@@ -105,12 +105,14 @@ private struct BindingRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .frame(width: 80, alignment: .leading)
+                .frame(minWidth: 80, alignment: .leading)
                 .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
 
             ShortcutRecorderButton(action: action, onCapture: onChange)
                 .glassButton()
                 .frame(minWidth: 180)
+                .accessibilityLabel(label)
 
             Spacer()
 
@@ -123,6 +125,8 @@ private struct BindingRow: View {
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)
             .frame(width: 24)
+            .help("More actions")
+            .accessibilityLabel("More actions for \(label)")
         }
     }
 

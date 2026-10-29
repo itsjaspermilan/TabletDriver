@@ -76,6 +76,7 @@ struct OnboardingView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.title2)
                         .foregroundStyle(.green)
+                        .accessibilityLabel("Granted")
                 } else {
                     Button("Grant…", action: action)
                         .glassButton(prominent: true)
