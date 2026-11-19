@@ -75,7 +75,7 @@
 		332B2A575B8A94601B9AB6BA /* ShortcutRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorder.swift; sourceTree = "<group>"; };
 		3891DD9ACDFCDDDD2EF2B45E /* ClickThresholdScaleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickThresholdScaleTests.swift; sourceTree = "<group>"; };
 		390AAB26A965F925245C1933 /* KeyCodeNamesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyCodeNamesTests.swift; sourceTree = "<group>"; };
-		44662E31D7FED07199BA924B /* TabletDriverApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TabletDriverApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		44662E31D7FED07199BA924B /* TabletDriver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TabletDriver.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		44F038A18C87A8E1CBABEAB1 /* Deco640ProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deco640ProfileTests.swift; sourceTree = "<group>"; };
 		49ABDA781233402B9DECFA62 /* TabletDriverKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TabletDriverKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CFDFCA25F16846B09299999 /* libTabletDriverKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTabletDriverKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -134,7 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				4CFDFCA25F16846B09299999 /* libTabletDriverKit.a */,
-				44662E31D7FED07199BA924B /* TabletDriverApp.app */,
+				44662E31D7FED07199BA924B /* TabletDriver.app */,
 				49ABDA781233402B9DECFA62 /* TabletDriverKitTests.xctest */,
 			);
 			name = Products;
@@ -317,7 +317,7 @@
 			packageProductDependencies = (
 			);
 			productName = TabletDriverApp;
-			productReference = 44662E31D7FED07199BA924B /* TabletDriverApp.app */;
+			productReference = 44662E31D7FED07199BA924B /* TabletDriver.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -538,6 +538,7 @@
 		1936A8DD1E220241CD166DED /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -640,6 +641,7 @@
 		71CD088D7489B4E78F47D677 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -675,6 +677,7 @@
 		A78F609562C36AF3BB3842F3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -697,6 +700,7 @@
 		FE3D63BE160C19B1C5BD3F80 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
