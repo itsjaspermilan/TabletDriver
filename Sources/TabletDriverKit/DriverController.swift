@@ -65,7 +65,7 @@ public final class DriverController {
             let point = self.screenMapper.map(x: pen.x, y: pen.y)
             self.cursorPoster.post(pen: pen, at: point)
             self.handlePenButtons(pen.penButtons)
-            DispatchQueue.main.async { self.lastPenReport = pen }
+            self.lastPenReport = pen
         }
         monitor.onAuxReport = { [weak self] aux in
             self?.handleAuxReport(aux)
@@ -107,7 +107,7 @@ public final class DriverController {
             }
         }
         previousAuxButtons = aux.buttons
-        DispatchQueue.main.async { self.lastAuxButtons = aux.buttons }
+        lastAuxButtons = aux.buttons
     }
 
     private func handlePenButtons(_ buttons: [Bool]) {
@@ -131,6 +131,6 @@ public final class DriverController {
             }
         }
         previousPenButtons = buttons
-        DispatchQueue.main.async { self.lastPenButtons = buttons }
+        lastPenButtons = buttons
     }
 }

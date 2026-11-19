@@ -61,6 +61,52 @@ final class BindingStoreTests: XCTestCase {
         XCTAssertEqual(store.bindings(for: "com.other.app", kind: .expressKey, count: 1), [defaultAction])
     }
 
+    func testAppOverrideFallsBackToDefaultPerKey() {
+        let store = BindingStore(applicationSupportDirectory: tempDirectory)
+        let undo = ExpressKeyAction.keyboardShortcut(modifiers: [.command], keyCode: 6)
+        let save = ExpressKeyAction.keyboardShortcut(modifiers: [.command], keyCode: 1)
+        let brush = ExpressKeyAction.keyboardShortcut(modifiers: [], keyCode: 11)
+        store.setBinding(undo, kind: .expressKey, index: 0, context: BindingStore.defaultContext)
+        store.setBinding(save, kind: .expressKey, index: 1, context: BindingStore.defaultContext)
+        store.setBinding(brush, kind: .expressKey, index: 0, context: "com.example.app")
+
+        XCTAssertEqual(store.bindings(for: "com.example.app", kind: .expressKey, count: 3), [brush, save, .none])
+    }
+
+    func testExplicitNoneOverrideDisablesTheDefault() {
+        let store = BindingStore(applicationSupportDirectory: tempDirectory)
+        let undo = ExpressKeyAction.keyboardShortcut(modifiers: [.command], keyCode: 6)
+        store.setBinding(undo, kind: .expressKey, index: 0, context: BindingStore.defaultContext)
+        store.setBinding(.none, kind: .expressKey, index: 0, context: "com.example.app")
+
+        XCTAssertEqual(store.bindings(for: "com.example.app", kind: .expressKey, count: 1), [.none])
+        XCTAssertEqual(store.storedBinding(context: "com.example.app", kind: .expressKey, index: 0), ExpressKeyAction.none)
+    }
+
+    func testRemovingOverrideRestoresDefault() {
+        let store = BindingStore(applicationSupportDirectory: tempDirectory)
+        let undo = ExpressKeyAction.keyboardShortcut(modifiers: [.command], keyCode: 6)
+        store.setBinding(undo, kind: .expressKey, index: 0, context: BindingStore.defaultContext)
+        store.setBinding(.none, kind: .expressKey, index: 0, context: "com.example.app")
+        store.removeBinding(kind: .expressKey, index: 0, context: "com.example.app")
+
+        XCTAssertNil(store.storedBinding(context: "com.example.app", kind: .expressKey, index: 0))
+        XCTAssertEqual(store.bindings(for: "com.example.app", kind: .expressKey, count: 1), [undo])
+    }
+
+    func testCorruptFileIsSetAsideNotOverwritten() throws {
+        try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
+        let fileURL = tempDirectory.appendingPathComponent("bindings.json")
+        let garbage = Data("{not json".utf8)
+        try garbage.write(to: fileURL)
+
+        let store = BindingStore(applicationSupportDirectory: tempDirectory)
+        store.setBinding(.keyboardShortcut(modifiers: [], keyCode: 1), kind: .expressKey, index: 0, context: BindingStore.defaultContext)
+
+        XCTAssertEqual(try Data(contentsOf: fileURL.appendingPathExtension("corrupt")), garbage)
+        XCTAssertNotNil(BindingStore(applicationSupportDirectory: tempDirectory).storedBinding(context: BindingStore.defaultContext, kind: .expressKey, index: 0))
+    }
+
     func testAddAndRemoveAppContext() {
         let store = BindingStore(applicationSupportDirectory: tempDirectory)
         store.addAppContext("com.example.app")

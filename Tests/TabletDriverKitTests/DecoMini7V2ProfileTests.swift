@@ -33,6 +33,13 @@ final class DecoMini7V2ProfileTests: XCTestCase {
         XCTAssertEqual(pen?.x ?? -1, 65536 / profile.maxX, accuracy: 0.000001)
     }
 
+    func testPressurePastMaximumIsClampedToOne() {
+        var report: [UInt8] = Array(repeating: 0, count: 12)
+        report[6] = 0xFF
+        report[7] = 0xFF
+        XCTAssertEqual(profile.parsePenReport(report)?.pressure, 1)
+    }
+
     func testRejectsUndersizedReport() {
         XCTAssertNil(profile.parsePenReport(Array(repeating: 0, count: 5)))
     }

@@ -19,8 +19,10 @@ public final class DeviceMonitor {
     private var manager: IOHIDManager?
 
     private struct ManagedDevice {
+        let device: IOHIDDevice
         let profile: TabletProfile
         let buffer: UnsafeMutablePointer<UInt8>
+        let bufferLength: Int
     }
     // Keyed by the device's raw CF pointer identity rather than IOHIDDevice
     // itself as a Dictionary key -- IOHIDManager fires its own internal
@@ -37,6 +39,10 @@ public final class DeviceMonitor {
 
     public init(profiles: [TabletProfile]) {
         self.profiles = profiles
+    }
+
+    deinit {
+        stop()
     }
 
     public func start() {
@@ -81,12 +87,21 @@ public final class DeviceMonitor {
         }
     }
 
+    /// Every device's input callback has to be unregistered and the device
+    /// unscheduled/closed *before* its report buffer is freed -- IOKit keeps
+    /// writing reports into that buffer for as long as the callback is live.
     public func stop() {
         for managed in devices.values {
+            IOHIDDeviceRegisterInputReportCallback(managed.device, managed.buffer, managed.bufferLength, nil, nil)
+            IOHIDDeviceUnscheduleFromRunLoop(managed.device, CFRunLoopGetMain(), CFRunLoopMode.commonModes.rawValue)
+            IOHIDDeviceClose(managed.device, IOOptionBits(kIOHIDOptionsTypeNone))
             managed.buffer.deallocate()
         }
         devices.removeAll()
         if let manager {
+            IOHIDManagerRegisterDeviceMatchingCallback(manager, nil, nil)
+            IOHIDManagerRegisterDeviceRemovalCallback(manager, nil, nil)
+            IOHIDManagerUnscheduleFromRunLoop(manager, CFRunLoopGetMain(), CFRunLoopMode.commonModes.rawValue)
             IOHIDManagerClose(manager, IOOptionBits(kIOHIDOptionsTypeNone))
         }
         manager = nil
@@ -123,7 +138,7 @@ public final class DeviceMonitor {
 
         let bufferLength = profile.inputReportLength
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferLength)
-        devices[deviceKey] = ManagedDevice(profile: profile, buffer: buffer)
+        devices[deviceKey] = ManagedDevice(device: device, profile: profile, buffer: buffer, bufferLength: bufferLength)
 
         let context = Unmanaged.passUnretained(self).toOpaque()
         IOHIDDeviceRegisterInputReportCallback(device, buffer, bufferLength, inputReportCallback, context)
@@ -145,11 +160,14 @@ public final class DeviceMonitor {
     }
 
     fileprivate func handleDeviceRemoved(_ device: IOHIDDevice) {
-        logger.log("device removed")
-        if let managed = devices.removeValue(forKey: key(for: device)) {
-            managed.buffer.deallocate()
+        guard let managed = devices.removeValue(forKey: key(for: device)) else { return }
+        logger.log("device removed, \(self.devices.count) interface(s) still open")
+        managed.buffer.deallocate()
+        // A composite tablet is matched once per HID interface; it's only
+        // actually gone once the last of them is.
+        if devices.isEmpty {
+            onDeviceDisconnected?()
         }
-        onDeviceDisconnected?()
     }
 
     private var reportLogCount = 0

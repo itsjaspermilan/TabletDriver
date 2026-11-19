@@ -38,24 +38,14 @@ struct SettingsView: View {
                     .tag(page)
             }
             .listStyle(.sidebar)
-            .navigationSplitViewColumnWidth(min: 170, ideal: 190, max: 220)
-            // The sidebar never needs to collapse -- it's a fixed list of
-            // 4 pages, not responsive content -- so the system's automatic
-            // collapse toggle is pure overhead: it's the stray arrow that
-            // flashes in the toolbar and the thing animating/re-laying-out
-            // the toolbar on every sidebar width change.
-            .toolbar(removing: .sidebarToggle)
+            .navigationSplitViewColumnWidth(min: 190, ideal: 210, max: 260)
         } detail: {
-            ZStack {
-                AmbientBackground()
-                switch navigator.page {
-                case .overview: OverviewPage(driver: driver)
-                case .buttons: ButtonsPage(driver: driver)
-                case .pressureTest: PressureTestView(driver: driver)
-                case .about: AboutPage()
-                }
+            switch navigator.page {
+            case .overview: OverviewPage(driver: driver)
+            case .buttons: ButtonsPage(driver: driver)
+            case .pressureTest: PressureTestView(driver: driver)
+            case .about: AboutPage()
             }
         }
-        .frame(minWidth: 760, minHeight: 540)
     }
 }

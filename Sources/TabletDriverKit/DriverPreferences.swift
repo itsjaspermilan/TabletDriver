@@ -19,8 +19,7 @@ public final class DriverPreferences: ObservableObject {
     public init(applicationSupportDirectory: URL) {
         fileURL = applicationSupportDirectory.appendingPathComponent("preferences.json")
 
-        if let data = try? Data(contentsOf: fileURL),
-           let decoded = try? JSONDecoder().decode(Stored.self, from: data) {
+        if let decoded = PersistedJSON.load(Stored.self, from: fileURL) {
             clickThreshold = decoded.clickThreshold
             mappingTarget = decoded.mappingTarget
         } else {
@@ -30,13 +29,7 @@ public final class DriverPreferences: ObservableObject {
     }
 
     private func save() {
-        let stored = Stored(clickThreshold: clickThreshold, mappingTarget: mappingTarget)
-        guard let data = try? JSONEncoder().encode(stored) else { return }
-        try? FileManager.default.createDirectory(
-            at: fileURL.deletingLastPathComponent(),
-            withIntermediateDirectories: true
-        )
-        try? data.write(to: fileURL)
+        PersistedJSON.save(Stored(clickThreshold: clickThreshold, mappingTarget: mappingTarget), to: fileURL)
     }
 
     private struct Stored: Codable {

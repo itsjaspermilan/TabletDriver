@@ -41,37 +41,6 @@ struct GlassContainer<Content: View>: View {
     }
 }
 
-/// Soft colored light behind the content so glass surfaces have something
-/// to refract.
-struct AmbientBackground: View {
-    var body: some View {
-        ZStack {
-            Color(nsColor: .windowBackgroundColor)
-            Circle()
-                .fill(Color.indigo.opacity(0.35))
-                .frame(width: 380, height: 380)
-                .blur(radius: 90)
-                .offset(x: -180, y: -170)
-            Circle()
-                .fill(Color.cyan.opacity(0.25))
-                .frame(width: 320, height: 320)
-                .blur(radius: 90)
-                .offset(x: 230, y: 40)
-            Circle()
-                .fill(Color.pink.opacity(0.18))
-                .frame(width: 300, height: 300)
-                .blur(radius: 100)
-                .offset(x: -40, y: 260)
-        }
-        // These blurred circles get recomposited every frame of the
-        // sidebar's open/close animation otherwise, which is expensive
-        // enough to visibly stutter the animation -- flatten them into one
-        // rasterized layer instead so the animation only moves a bitmap.
-        .drawingGroup()
-        .ignoresSafeArea()
-    }
-}
-
 struct CardSection<Content: View>: View {
     let title: String
     var systemImage: String?

@@ -1,17 +1,11 @@
-import Combine
 import SwiftUI
 import TabletDriverKit
 
 struct OnboardingView: View {
-    @Binding var hasPermissions: Bool
-    @State private var hasInputMonitoring = PermissionManager.hasInputMonitoringAccess()
-    @State private var hasAccessibility = PermissionManager.hasAccessibilityAccess()
-
-    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    let permissions: PermissionStatus
 
     var body: some View {
-        ZStack {
-            AmbientBackground()
+        Group {
             VStack(spacing: 20) {
                 if let icon = NSApplication.shared.applicationIconImage {
                     Image(nsImage: icon)
@@ -32,31 +26,26 @@ struct OnboardingView: View {
                             title: "Input Monitoring",
                             detail: "Reads pen and button data from the tablet",
                             symbol: "dot.radiowaves.left.and.right",
-                            granted: hasInputMonitoring,
-                            note: hasInputMonitoring ? nil : "If TabletDriver isn't listed in the settings page that opens, click + and add it yourself, then enable its checkbox.",
+                            granted: permissions.hasInputMonitoring,
+                            note: permissions.hasInputMonitoring ? nil : "If TabletDriver isn't listed in the settings page that opens, click + and add it yourself, then enable its checkbox.",
                             action: { PermissionManager.requestInputMonitoringAccess() }
                         )
                         permissionRow(
                             title: "Accessibility",
                             detail: "Moves the cursor and presses shortcuts",
                             symbol: "accessibility",
-                            granted: hasAccessibility,
+                            granted: permissions.hasAccessibility,
                             note: nil,
                             action: { PermissionManager.requestAccessibilityAccess() }
                         )
                     }
                 }
 
-                Text("This window updates automatically once both are granted in System Settings.")
+                Text("This window closes automatically once both are granted in System Settings.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             .padding(28)
-        }
-        .onReceive(timer) { _ in
-            hasInputMonitoring = PermissionManager.hasInputMonitoringAccess()
-            hasAccessibility = PermissionManager.hasAccessibilityAccess()
-            hasPermissions = hasInputMonitoring && hasAccessibility
         }
     }
 

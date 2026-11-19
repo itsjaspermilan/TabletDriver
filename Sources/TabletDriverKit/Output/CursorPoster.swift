@@ -1,3 +1,4 @@
+import AppKit
 import CoreGraphics
 
 /// Moves the system cursor and emulates clicks from a pressure threshold,
@@ -26,10 +27,22 @@ public final class CursorPoster {
     /// pressure (see `PenReport.pressure`).
     public var clickThreshold: Double
 
+    /// Once down, pressure has to fall below this fraction of
+    /// `clickThreshold` to release -- without the gap, pressure hovering
+    /// right at the threshold toggled down/up every report and broke a
+    /// single stroke into many short ones.
+    static let releaseRatio = 0.75
+
     private var isDown = false
     private var hasSentProximity = false
-    private var lastEraser = false
+    private var proximityEraser = false
     private var lastPoint: CGPoint = .zero
+
+    private let doubleClickInterval: TimeInterval
+    private var clickState: Int64 = 1
+    private var lastDownTime: TimeInterval = -.infinity
+    private var lastDownPoint: CGPoint = .zero
+    private static let doubleClickDistance: CGFloat = 6
 
     // Wacom's own capability mask bits (see
     // https://github.com/Wacom-Developer/wacom-device-kit-macos-scribble-demo,
@@ -42,18 +55,30 @@ public final class CursorPoster {
     private static let tabletPointSubtype: Int64 = 1
     private static let tabletProximitySubtype: Int64 = 2
 
-    public init(clickThreshold: Double = 0.025) {
+    public init(clickThreshold: Double = 0.025, doubleClickInterval: TimeInterval = NSEvent.doubleClickInterval) {
         self.clickThreshold = clickThreshold
+        self.doubleClickInterval = doubleClickInterval
     }
 
     public func post(pen: PenReport, at point: CGPoint) {
+        // The eraser end is announced through the proximity event's pointer
+        // type (that's what makes drawing apps switch to their eraser
+        // tool), so flipping ends mid-proximity needs a fresh exit/enter.
+        if hasSentProximity && pen.eraser != proximityEraser {
+            postProximity(entering: false, eraser: proximityEraser)
+            hasSentProximity = false
+        }
         if !hasSentProximity {
-            postProximity(eraser: pen.eraser)
+            postProximity(entering: true, eraser: pen.eraser)
             hasSentProximity = true
+            proximityEraser = pen.eraser
         }
         lastPoint = point
 
         let type = nextEventType(for: pen)
+        if type == .leftMouseDown {
+            clickState = registerMouseDown(at: point, time: ProcessInfo.processInfo.systemUptime)
+        }
         postEvent(type: type, at: point, pen: pen)
     }
 
@@ -77,8 +102,11 @@ public final class CursorPoster {
             postEvent(
                 type: type,
                 at: lastPoint,
-                pen: PenReport(x: 0, y: 0, pressure: 0, tiltX: 0, tiltY: 0, penButtons: [], eraser: lastEraser)
+                pen: PenReport(x: 0, y: 0, pressure: 0, tiltX: 0, tiltY: 0, penButtons: [], eraser: proximityEraser)
             )
+        }
+        if hasSentProximity {
+            postProximity(entering: false, eraser: proximityEraser)
         }
         hasSentProximity = false
     }
@@ -87,33 +115,41 @@ public final class CursorPoster {
     /// actual `CGEvent` side effect so it can be unit tested without
     /// posting real system-wide events.
     func nextEventType(for pen: PenReport) -> CGEventType {
-        let shouldBeDown = pen.pressure > clickThreshold
-        lastEraser = pen.eraser
+        let threshold = isDown ? clickThreshold * Self.releaseRatio : clickThreshold
+        let shouldBeDown = pen.pressure > threshold
 
         if shouldBeDown != isDown {
             isDown = shouldBeDown
-            return shouldBeDown
-                ? (pen.eraser ? .rightMouseDown : .leftMouseDown)
-                : (pen.eraser ? .rightMouseUp : .leftMouseUp)
+            return shouldBeDown ? .leftMouseDown : .leftMouseUp
         }
-        return isDown
-            ? (pen.eraser ? .rightMouseDragged : .leftMouseDragged)
-            : .mouseMoved
+        return isDown ? .leftMouseDragged : .mouseMoved
     }
 
     /// Pure decision logic for `penDidLeaveRange()`, mirroring `nextEventType`.
     func rangeExitEventType() -> CGEventType? {
-        isDown ? (lastEraser ? .rightMouseUp : .leftMouseUp) : nil
+        isDown ? .leftMouseUp : nil
+    }
+
+    /// Synthesized mouse events always carry a click count of 1 unless told
+    /// otherwise, so without this a pen double-tap never registers as a
+    /// double-click anywhere (opening files, selecting words).
+    func registerMouseDown(at point: CGPoint, time: TimeInterval) -> Int64 {
+        let isRepeat = time - lastDownTime <= doubleClickInterval
+            && abs(point.x - lastDownPoint.x) <= Self.doubleClickDistance
+            && abs(point.y - lastDownPoint.y) <= Self.doubleClickDistance
+        lastDownTime = time
+        lastDownPoint = point
+        return isRepeat ? clickState + 1 : 1
     }
 
     private func postEvent(type: CGEventType, at point: CGPoint, pen: PenReport) {
-        let button: CGMouseButton = pen.eraser ? .right : .left
         guard let event = CGEvent(
             mouseEventSource: nil,
             mouseType: type,
             mouseCursorPosition: point,
-            mouseButton: button
+            mouseButton: .left
         ) else { return }
+        event.setIntegerValueField(.mouseEventClickState, value: clickState)
 
         // Release events are deliberately left as plain, undecorated
         // mouse-ups: marking an event with the tablet-point subtype (needed
@@ -126,7 +162,7 @@ public final class CursorPoster {
         // could resolve, since that's the only thing that delivered a
         // plain mouseUp. Release transitions don't need pressure/tilt data
         // anyway -- the stroke is already ending.
-        guard type != .leftMouseUp, type != .rightMouseUp else {
+        guard type != .leftMouseUp else {
             event.post(tap: .cghidEventTap)
             return
         }
@@ -145,10 +181,10 @@ public final class CursorPoster {
         event.post(tap: .cghidEventTap)
     }
 
-    private func postProximity(eraser: Bool) {
+    private func postProximity(entering: Bool, eraser: Bool) {
         guard let event = CGEvent(source: nil) else { return }
         event.setIntegerValueField(.mouseEventSubtype, value: Self.tabletProximitySubtype)
-        event.setIntegerValueField(.tabletProximityEventEnterProximity, value: 1)
+        event.setIntegerValueField(.tabletProximityEventEnterProximity, value: entering ? 1 : 0)
         event.setIntegerValueField(.tabletProximityEventPointerType, value: eraser ? 3 : 1) // NSPointingDeviceType: pen=1, eraser=3
         event.setIntegerValueField(.tabletProximityEventCapabilityMask, value: Self.capabilityMask)
         event.setIntegerValueField(.tabletProximityEventDeviceID, value: Self.deviceID)

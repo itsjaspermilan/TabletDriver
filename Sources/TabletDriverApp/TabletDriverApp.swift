@@ -14,75 +14,112 @@ let applicationSupportDirectory: URL = {
 
 @main
 struct TabletDriverApp: App {
-    @State private var driver = DriverController(
-        applicationSupportDirectory: applicationSupportDirectory
-    )
-    @State private var hasPermissions = PermissionManager.hasAllPermissions
-    @State private var hasStartedDriver = false
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        MenuBarExtra(driver.isConnected ? "Tablet: Connected" : "Tablet: Disconnected", systemImage: "pencil.and.outline") {
-            Color.clear.frame(width: 0, height: 0).task {
-                // Deliberately not done in `init()`: calling methods on a
-                // @StateObject there is a known SwiftUI anti-pattern that can
-                // create a second, throwaway instance of `driver` before it's
-                // installed on a view -- which meant two separate
-                // DeviceMonitors both trying to seize the same HID devices,
-                // and crashed with SIGSEGV shortly after launch. `.task` runs
-                // once the real, persistent instance is installed.
-                guard !hasStartedDriver, hasPermissions else { return }
-                hasStartedDriver = true
-                driver.start()
-                InstallController.installOnFirstRun()
-            }
-            if hasPermissions {
-                Text(driver.isConnected ? "\(driver.activeProfile?.name ?? "Tablet") connected" : "Waiting for tablet…")
-                Divider()
-                Button("Settings…") {
-                    openSettingsWindow(page: .overview)
-                }
-                Button("Pressure Test…") {
-                    openSettingsWindow(page: .pressureTest)
-                }
-                Button("Uninstall…") {
-                    InstallController.uninstall(applicationSupportDirectory: applicationSupportDirectory, bundleIdentifier: bundleIdentifier)
-                    NSApplication.shared.terminate(nil)
-                }
-                Divider()
-                Button("Quit") { NSApplication.shared.terminate(nil) }
-            } else {
-                Text("Permissions required")
-                Button("Open Permission Setup…") {
-                    openOnboardingWindow()
-                }
-                Divider()
-                Button("Quit") { NSApplication.shared.terminate(nil) }
-            }
+        MenuBarExtra {
+            MenuContent(appDelegate: appDelegate, driver: appDelegate.driver, permissions: appDelegate.permissions)
+        } label: {
+            MenuBarLabel(driver: appDelegate.driver)
         }
-        .onChange(of: hasPermissions) { _, granted in
-            appLogger.log("hasPermissions changed to \(granted)")
-            guard granted, !hasStartedDriver else { return }
-            hasStartedDriver = true
-            driver.start()
-            InstallController.installOnFirstRun()
+    }
+}
+
+private struct MenuBarLabel: View {
+    let driver: DriverController
+
+    var body: some View {
+        Label(
+            driver.isConnected ? "Tablet: Connected" : "Tablet: Disconnected",
+            systemImage: driver.isConnected ? "pencil.and.outline" : "pencil.slash"
+        )
+    }
+}
+
+private struct MenuContent: View {
+    let appDelegate: AppDelegate
+    let driver: DriverController
+    let permissions: PermissionStatus
+
+    var body: some View {
+        if permissions.allGranted {
+            Text(driver.isConnected ? "\(driver.activeProfile?.name ?? "Tablet") connected" : "Waiting for tablet…")
+            Divider()
+            Button("Settings…") { appDelegate.openSettingsWindow(page: .overview) }
+            Button("Pressure Test…") { appDelegate.openSettingsWindow(page: .pressureTest) }
+            Button("Uninstall…") { appDelegate.confirmUninstall() }
+        } else {
+            Text("Permissions required")
+            Button("Open Permission Setup…") { appDelegate.openOnboardingWindow() }
+        }
+        Divider()
+        Button("Quit") { NSApplication.shared.terminate(nil) }
+    }
+}
+
+/// Owns the driver and does launch-time setup. `NSApplicationDelegateAdaptor`
+/// instantiates this exactly once, unlike SwiftUI `@State`/`@StateObject`
+/// in an `App`, which can be created more than once -- two `DriverController`s
+/// meant two `DeviceMonitor`s seizing the same HID device, which crashed.
+/// Starting from `applicationDidFinishLaunching` (rather than a `.task` in
+/// the menu content) also means the driver runs at login without anyone
+/// having to open the menu first.
+@MainActor
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    let driver = DriverController(applicationSupportDirectory: applicationSupportDirectory)
+    let permissions = PermissionStatus()
+    private var hasStartedDriver = false
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        appLogger.log("launched, input=\(self.permissions.hasInputMonitoring), accessibility=\(self.permissions.hasAccessibility)")
+        if permissions.allGranted {
+            startDriver()
+        } else {
+            openOnboardingWindow()
+            permissions.pollUntilGranted { [weak self] in
+                guard let self else { return }
+                appLogger.log("permissions granted")
+                self.startDriver()
+                WindowRetainer.shared.window(for: "onboarding")?.close()
+                self.openSettingsWindow(page: .overview)
+            }
         }
     }
 
-    init() {
-        let granted = PermissionManager.hasAllPermissions
-        appLogger.log("app init, hasAllPermissions=\(granted) (input=\(PermissionManager.hasInputMonitoringAccess()), accessibility=\(PermissionManager.hasAccessibilityAccess()))")
+    private func startDriver() {
+        guard !hasStartedDriver else { return }
+        hasStartedDriver = true
+        driver.start()
+        InstallController.installOnFirstRun()
     }
 
-    private func openOnboardingWindow() {
+    func openOnboardingWindow() {
         showWindow(id: "onboarding", title: "TabletDriver Setup", size: NSSize(width: 480, height: 440)) {
-            OnboardingView(hasPermissions: $hasPermissions)
+            OnboardingView(permissions: permissions)
         }
     }
 
-    private func openSettingsWindow(page: SettingsPage) {
+    func openSettingsWindow(page: SettingsPage) {
         SettingsNavigator.shared.page = page
         showWindow(id: "settings", title: "TabletDriver", size: NSSize(width: 900, height: 620), resizable: true) {
             SettingsView(driver: driver)
+        }
+    }
+
+    func confirmUninstall() {
+        NSApp.activate(ignoringOtherApps: true)
+        let alert = NSAlert()
+        alert.alertStyle = .warning
+        alert.messageText = "Uninstall TabletDriver?"
+        alert.informativeText = "This deletes your button bindings and settings, turns off launch at login, resets TabletDriver's Input Monitoring and Accessibility permissions, and moves the app to the Trash."
+        alert.addButton(withTitle: "Uninstall").hasDestructiveAction = true
+        alert.addButton(withTitle: "Cancel")
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+
+        driver.stop()
+        InstallController.uninstall(applicationSupportDirectory: applicationSupportDirectory, bundleIdentifier: bundleIdentifier)
+        InstallController.moveAppToTrash {
+            NSApplication.shared.terminate(nil)
         }
     }
 
@@ -101,20 +138,58 @@ struct TabletDriverApp: App {
             backing: .buffered,
             defer: false
         )
-        window.titlebarAppearsTransparent = true
-        // Each page sets its own `.navigationTitle`, which `NSHostingView`
-        // bridges into this window's real titlebar/toolbar automatically
-        // (its `sceneBridgingOptions` defaults to `.all` as the contentView)
-        // -- that's what actually produces the native floating Liquid Glass
-        // toolbar. Hiding the title here would hide that too.
-        window.titleVisibility = .visible
-        window.center()
         window.title = title
-        window.contentView = NSHostingView(rootView: content())
+        // Each page sets its own `.navigationTitle`, which the hosting
+        // controller bridges into this window's real titlebar/toolbar.
+        // Using a controller (not a bare hosting view as contentView) lets
+        // AppKit lay out the traffic lights and titlebar like a SwiftUI scene.
+        let controller = NSHostingController(rootView: content())
+        // Without this the hosting controller re-derives the window's
+        // min/max size from its content on every layout pass, which fights
+        // the sidebar expand animation (content slides, then snaps).
+        controller.sizingOptions = []
+        window.contentViewController = controller
+        window.setContentSize(size)
+        window.center()
+        if resizable { window.contentMinSize = NSSize(width: 760, height: 540) }
         window.isReleasedWhenClosed = false
         WindowRetainer.shared.retain(window, for: id)
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
+    }
+}
+
+/// Live Input Monitoring/Accessibility state. Polled while anything is
+/// missing, since macOS posts no notification when either is granted in
+/// System Settings -- and it's polled from launch, not just while the
+/// setup window is open, so granting them with that window closed still
+/// starts the driver.
+@MainActor
+@Observable
+final class PermissionStatus {
+    private(set) var hasInputMonitoring = PermissionManager.hasInputMonitoringAccess()
+    private(set) var hasAccessibility = PermissionManager.hasAccessibilityAccess()
+    @ObservationIgnored private var timer: Timer?
+
+    var allGranted: Bool { hasInputMonitoring && hasAccessibility }
+
+    func pollUntilGranted(onGranted: @escaping @MainActor () -> Void) {
+        timer?.invalidate()
+        let timer = Timer(timeInterval: 1, repeats: true) { [weak self] timer in
+            MainActor.assumeIsolated {
+                guard let self else { return timer.invalidate() }
+                self.hasInputMonitoring = PermissionManager.hasInputMonitoringAccess()
+                self.hasAccessibility = PermissionManager.hasAccessibilityAccess()
+                guard self.allGranted else { return }
+                timer.invalidate()
+                self.timer = nil
+                onGranted()
+            }
+        }
+        // `.common` so the poll keeps running while the menu bar menu is
+        // open (menu tracking switches the run loop out of the default mode).
+        RunLoop.main.add(timer, forMode: .common)
+        self.timer = timer
     }
 }
 

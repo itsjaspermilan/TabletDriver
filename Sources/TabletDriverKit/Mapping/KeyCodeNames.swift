@@ -43,7 +43,7 @@ public enum KeyCodeNames {
         case let .keyboardShortcut(modifiers, keyCode):
             return description(modifiers: modifiers, keyCode: keyCode)
         case let .launchApp(bundleIdentifier):
-            return "Launch " + bundleIdentifier
+            return "Launch " + AppNames.displayName(for: bundleIdentifier)
         }
     }
 }

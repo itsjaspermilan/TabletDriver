@@ -1,4 +1,4 @@
-import Foundation
+import AppKit
 import ServiceManagement
 
 /// Registers/unregisters this app as a login item via `SMAppService.mainApp`,
@@ -6,15 +6,19 @@ import ServiceManagement
 enum InstallController {
     private static let firstRunKey = "didConfigureLoginItem"
 
-    static var isEnabled: Bool {
-        SMAppService.mainApp.status == .enabled
+    static var status: SMAppService.Status {
+        SMAppService.mainApp.status
     }
 
-    static func setEnabled(_ enabled: Bool) {
+    static var isEnabled: Bool {
+        status == .enabled
+    }
+
+    static func setEnabled(_ enabled: Bool) throws {
         if enabled {
-            try? SMAppService.mainApp.register()
+            try SMAppService.mainApp.register()
         } else {
-            try? SMAppService.mainApp.unregister()
+            try SMAppService.mainApp.unregister()
         }
     }
 
@@ -23,7 +27,7 @@ enum InstallController {
     static func installOnFirstRun() {
         guard !UserDefaults.standard.bool(forKey: firstRunKey) else { return }
         UserDefaults.standard.set(true, forKey: firstRunKey)
-        setEnabled(true)
+        try? setEnabled(true)
     }
 
     static func uninstall(applicationSupportDirectory: URL, bundleIdentifier: String) {
@@ -33,6 +37,16 @@ enum InstallController {
         try? FileManager.default.removeItem(at: applicationSupportDirectory)
         UserDefaults.standard.removeObject(forKey: firstRunKey)
         resetTCCGrants(bundleIdentifier: bundleIdentifier)
+    }
+
+    /// Only for a real `.app` bundle -- a `swift run` build's "bundle" is
+    /// the build products directory, which must not be trashed.
+    static func moveAppToTrash(completion: @escaping () -> Void) {
+        let appURL = Bundle.main.bundleURL
+        guard appURL.pathExtension == "app" else { return completion() }
+        NSWorkspace.shared.recycle([appURL]) { _, _ in
+            DispatchQueue.main.async(execute: completion)
+        }
     }
 
     private static func resetTCCGrants(bundleIdentifier: String) {

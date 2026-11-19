@@ -48,6 +48,13 @@ rm -rf "$APP_BUNDLE"
 mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
 cp "$BINARY_PATH" "$APP_BUNDLE/Contents/MacOS/TabletDriverApp"
 
+# SwiftPM stamps the binary with sdk 14.0 (the deployment target), and macOS
+# gives apps linked against an older SDK the old window chrome (small
+# traffic lights, no Liquid Glass). Record the real SDK so the new design applies.
+echo "==> Stamping build SDK $(xcrun --show-sdk-version) (new macOS window chrome)"
+vtool -set-build-version macos 14.0 "$(xcrun --show-sdk-version)" -replace \
+    -output "$APP_BUNDLE/Contents/MacOS/TabletDriverApp" "$APP_BUNDLE/Contents/MacOS/TabletDriverApp"
+
 echo "==> Compiling Liquid Glass icon (Resources/AppIcon.icon)"
 xcrun actool "$ROOT_DIR/Resources/AppIcon.icon" \
     --compile "$APP_BUNDLE/Contents/Resources" \
@@ -55,37 +62,21 @@ xcrun actool "$ROOT_DIR/Resources/AppIcon.icon" \
     --app-icon AppIcon \
     --output-partial-info-plist /dev/null >/dev/null
 
-cat > "$APP_BUNDLE/Contents/Info.plist" <<PLIST
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleExecutable</key>
-    <string>TabletDriverApp</string>
-    <key>CFBundleIdentifier</key>
-    <string>$BUNDLE_ID</string>
-    <key>CFBundleName</key>
-    <string>$APP_NAME</string>
-    <key>CFBundleIconFile</key>
-    <string>AppIcon</string>
-    <key>CFBundleIconName</key>
-    <string>AppIcon</string>
-    <key>CFBundleShortVersionString</key>
-    <string>$VERSION</string>
-    <key>CFBundleVersion</key>
-    <string>$VERSION</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>LSMinimumSystemVersion</key>
-    <string>14.0</string>
-    <key>LSUIElement</key>
-    <true/>
-</dict>
-</plist>
-PLIST
+# Resources/Info.plist is the one Info.plist shared with the Xcode project;
+# fill in the build-setting placeholders Xcode would normally substitute.
+PLIST_PATH="$APP_BUNDLE/Contents/Info.plist"
+sed -e 's/$(DEVELOPMENT_LANGUAGE)/en/' \
+    -e 's/$(EXECUTABLE_NAME)/TabletDriverApp/' \
+    -e "s/\$(PRODUCT_BUNDLE_IDENTIFIER)/$BUNDLE_ID/" \
+    "$ROOT_DIR/Resources/Info.plist" > "$PLIST_PATH"
+plutil -replace CFBundleShortVersionString -string "$VERSION" "$PLIST_PATH"
+plutil -replace CFBundleVersion -string "$VERSION" "$PLIST_PATH"
+plutil -replace CFBundleIconFile -string AppIcon "$PLIST_PATH"
+plutil -replace CFBundleIconName -string AppIcon "$PLIST_PATH"
+plutil -lint "$PLIST_PATH" >/dev/null
 
 echo "==> Codesigning with stable identifier"
-codesign --force --deep --options runtime --sign "$SIGN_IDENTITY" --identifier "$BUNDLE_ID" "$APP_BUNDLE"
+codesign --force --options runtime --sign "$SIGN_IDENTITY" --identifier "$BUNDLE_ID" "$APP_BUNDLE"
 
 echo "==> Gatekeeper assessment"
 spctl -a -vv "$APP_BUNDLE" || echo "(rejected -- expected for a non-notarized personal build; launching it directly still works)"

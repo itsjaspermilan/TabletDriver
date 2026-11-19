@@ -22,11 +22,35 @@ final class CursorPosterTests: XCTestCase {
         XCTAssertEqual(poster.nextEventType(for: pen(pressure: 0.0)), .mouseMoved)
     }
 
-    func testEraserUsesRightClickInstead() {
+    func testEraserStillUsesTheLeftButton() {
+        // The eraser is signalled via the proximity event's pointer type;
+        // a right-click would open context menus in drawing apps instead.
         let poster = CursorPoster(clickThreshold: 0.1)
-        XCTAssertEqual(poster.nextEventType(for: pen(pressure: 0.5, eraser: true)), .rightMouseDown)
-        XCTAssertEqual(poster.nextEventType(for: pen(pressure: 0.6, eraser: true)), .rightMouseDragged)
-        XCTAssertEqual(poster.nextEventType(for: pen(pressure: 0.0, eraser: true)), .rightMouseUp)
+        XCTAssertEqual(poster.nextEventType(for: pen(pressure: 0.5, eraser: true)), .leftMouseDown)
+        XCTAssertEqual(poster.nextEventType(for: pen(pressure: 0.6, eraser: true)), .leftMouseDragged)
+        XCTAssertEqual(poster.nextEventType(for: pen(pressure: 0.0, eraser: true)), .leftMouseUp)
+    }
+
+    func testPressureJustBelowThresholdDoesNotReleaseWhileDown() {
+        let poster = CursorPoster(clickThreshold: 0.1)
+        XCTAssertEqual(poster.nextEventType(for: pen(pressure: 0.11)), .leftMouseDown)
+        XCTAssertEqual(poster.nextEventType(for: pen(pressure: 0.09)), .leftMouseDragged)
+        XCTAssertEqual(poster.nextEventType(for: pen(pressure: 0.11)), .leftMouseDragged)
+        XCTAssertEqual(poster.nextEventType(for: pen(pressure: 0.07)), .leftMouseUp)
+        XCTAssertEqual(poster.nextEventType(for: pen(pressure: 0.09)), .mouseMoved)
+    }
+
+    func testQuickNearbyTapsCountUp() {
+        let poster = CursorPoster(clickThreshold: 0.1, doubleClickInterval: 0.5)
+        XCTAssertEqual(poster.registerMouseDown(at: CGPoint(x: 100, y: 100), time: 10.0), 1)
+        XCTAssertEqual(poster.registerMouseDown(at: CGPoint(x: 103, y: 98), time: 10.3), 2)
+    }
+
+    func testSlowOrDistantTapsStartOver() {
+        let poster = CursorPoster(clickThreshold: 0.1, doubleClickInterval: 0.5)
+        XCTAssertEqual(poster.registerMouseDown(at: CGPoint(x: 100, y: 100), time: 10.0), 1)
+        XCTAssertEqual(poster.registerMouseDown(at: CGPoint(x: 100, y: 100), time: 11.0), 1)
+        XCTAssertEqual(poster.registerMouseDown(at: CGPoint(x: 150, y: 100), time: 11.1), 1)
     }
 
     func testResetClearsDownState() {
@@ -50,10 +74,10 @@ final class CursorPosterTests: XCTestCase {
         XCTAssertEqual(poster.rangeExitEventType(), .leftMouseUp)
     }
 
-    func testLeavingRangeWithEraserDownReleasesRightClick() {
+    func testLeavingRangeWithEraserDownReleasesTheClick() {
         let poster = CursorPoster(clickThreshold: 0.1)
         _ = poster.nextEventType(for: pen(pressure: 0.5, eraser: true))
-        XCTAssertEqual(poster.rangeExitEventType(), .rightMouseUp)
+        XCTAssertEqual(poster.rangeExitEventType(), .leftMouseUp)
     }
 
     func testLeavingRangeWhileUpDoesNothing() {

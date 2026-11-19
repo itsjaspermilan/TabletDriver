@@ -49,7 +49,7 @@ public struct DecoMini7V2Profile: TabletProfile {
         return PenReport(
             x: x / maxX,
             y: y / maxY,
-            pressure: Double(pressure) / Double(maxPressure),
+            pressure: min(1, Double(pressure) / Double(maxPressure)),
             tiltX: Int8(bitPattern: report[8]),
             tiltY: Int8(bitPattern: report[9]),
             penButtons: [status.isBitSet(1), status.isBitSet(2)],

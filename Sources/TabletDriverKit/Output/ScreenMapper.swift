@@ -17,10 +17,41 @@ public final class ScreenMapper {
         case activeWindow
     }
 
-    public var target: Target
+    public var target: Target {
+        didSet { cachedDisplayRect = nil }
+    }
+
+    // Everything below is only touched on the main thread, which is where
+    // HID reports (and so `map`) arrive.
+    private var cachedDisplayRect: CGRect?
+    private var screenObserver: NSObjectProtocol?
+
+    // Looking up the frontmost window is several synchronous Accessibility
+    // round trips into *another* app; doing that inline for every pen
+    // report froze the cursor for as long as that app was unresponsive.
+    // It's fetched off the main thread instead, at most every
+    // `windowRefreshInterval`, and `map` always uses the latest result.
+    private var windowFrame: CGRect?
+    private var windowFrameFetchedAt: TimeInterval = -.infinity
+    private var isFetchingWindowFrame = false
+    private static let windowRefreshInterval: TimeInterval = 0.1
+    private static let windowQueue = DispatchQueue(label: "com.tabletdriver.window-frame", qos: .userInteractive)
 
     public init(target: Target) {
         self.target = target
+        screenObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didChangeScreenParametersNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.cachedDisplayRect = nil
+        }
+    }
+
+    deinit {
+        if let screenObserver {
+            NotificationCenter.default.removeObserver(screenObserver)
+        }
     }
 
     /// `x`/`y` are already normalized 0...1 (see `PenReport`).
@@ -43,21 +74,42 @@ public final class ScreenMapper {
     public func currentRect() -> CGRect {
         switch target {
         case .display(let id):
+            if let cachedDisplayRect { return cachedDisplayRect }
             let bounds = CGDisplayBounds(id)
-            return bounds.isEmpty ? CGDisplayBounds(CGMainDisplayID()) : bounds
+            let rect = bounds.isEmpty ? CGDisplayBounds(CGMainDisplayID()) : bounds
+            cachedDisplayRect = rect
+            return rect
         case .activeWindow:
-            return Self.frontmostWindowFrame() ?? CGDisplayBounds(CGMainDisplayID())
+            refreshWindowFrameIfStale()
+            return windowFrame ?? CGDisplayBounds(CGMainDisplayID())
         }
     }
 
-    private static func frontmostWindowFrame() -> CGRect? {
-        guard let app = NSWorkspace.shared.frontmostApplication else { return nil }
-        let axApp = AXUIElementCreateApplication(app.processIdentifier)
+    private func refreshWindowFrameIfStale() {
+        let now = ProcessInfo.processInfo.systemUptime
+        guard !isFetchingWindowFrame, now - windowFrameFetchedAt >= Self.windowRefreshInterval,
+              let pid = NSWorkspace.shared.frontmostApplication?.processIdentifier else { return }
+        isFetchingWindowFrame = true
+        Self.windowQueue.async { [weak self] in
+            let frame = Self.focusedWindowFrame(pid: pid)
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.windowFrame = frame
+                self.windowFrameFetchedAt = ProcessInfo.processInfo.systemUptime
+                self.isFetchingWindowFrame = false
+            }
+        }
+    }
+
+    private static func focusedWindowFrame(pid: pid_t) -> CGRect? {
+        let axApp = AXUIElementCreateApplication(pid)
+        AXUIElementSetMessagingTimeout(axApp, 0.25)
 
         var focusedWindow: AnyObject?
         guard AXUIElementCopyAttributeValue(axApp, kAXFocusedWindowAttribute as CFString, &focusedWindow) == .success,
               let window = focusedWindow else { return nil }
         let axWindow = window as! AXUIElement
+        AXUIElementSetMessagingTimeout(axWindow, 0.25)
 
         var positionValue: AnyObject?
         var sizeValue: AnyObject?

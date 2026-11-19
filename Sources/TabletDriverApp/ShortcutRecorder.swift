@@ -38,12 +38,12 @@ final class ShortcutRecorderModel: ObservableObject {
 }
 
 struct ShortcutRecorderButton: View {
-    let action: ExpressKeyAction
+    let title: String
     let onCapture: (ExpressKeyAction) -> Void
     @StateObject private var recorder = ShortcutRecorderModel()
 
     var body: some View {
-        Button(recorder.isRecording ? "Press any key… (Esc to cancel)" : KeyCodeNames.description(for: action)) {
+        Button(recorder.isRecording ? "Press any key… (Esc to cancel)" : title) {
             if recorder.isRecording {
                 recorder.stopRecording()
             } else {
@@ -53,7 +53,7 @@ struct ShortcutRecorderButton: View {
             }
         }
         .foregroundStyle(recorder.isRecording ? .orange : .primary)
-        .accessibilityValue(recorder.isRecording ? "Recording, press any key, or Escape to cancel" : KeyCodeNames.description(for: action))
+        .accessibilityValue(recorder.isRecording ? "Recording, press any key, or Escape to cancel" : title)
         .accessibilityHint("Records the next key press as this button's shortcut")
         .onDisappear { recorder.stopRecording() }
     }

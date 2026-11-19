@@ -21,6 +21,17 @@ final class DriverPreferencesTests: XCTestCase {
         XCTAssertEqual(prefs.clickThreshold, 0.025, accuracy: 0.000001)
     }
 
+    func testCorruptFileFallsBackToDefaultsAndIsSetAside() throws {
+        try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
+        let fileURL = tempDirectory.appendingPathComponent("preferences.json")
+        try Data("garbage".utf8).write(to: fileURL)
+
+        let prefs = DriverPreferences(applicationSupportDirectory: tempDirectory)
+
+        XCTAssertEqual(prefs.clickThreshold, 0.025, accuracy: 0.000001)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: fileURL.appendingPathExtension("corrupt").path))
+    }
+
     func testPersistsAcrossInstances() {
         do {
             let prefs = DriverPreferences(applicationSupportDirectory: tempDirectory)

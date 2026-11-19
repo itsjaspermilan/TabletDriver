@@ -33,25 +33,37 @@ struct ButtonsPage: View {
             if penButtonCount > 0 {
                 CardSection(title: "Pen Buttons", systemImage: "pencil.tip") {
                     ForEach(0..<penButtonCount, id: \.self) { index in
-                        BindingRow(
-                            label: "Button \(index + 1)",
-                            action: bindingStore.binding(context: selectedContext, kind: .penButton, index: index),
-                            onChange: { bindingStore.setBinding($0, kind: .penButton, index: index, context: selectedContext) }
-                        )
+                        bindingRow(label: "Button \(index + 1)", kind: .penButton, index: index)
                     }
                 }
             }
 
             CardSection(title: "Express Keys", systemImage: "keyboard") {
                 ForEach(0..<expressKeyCount, id: \.self) { index in
-                    BindingRow(
-                        label: "Key \(index + 1)",
-                        action: bindingStore.binding(context: selectedContext, kind: .expressKey, index: index),
-                        onChange: { bindingStore.setBinding($0, kind: .expressKey, index: index, context: selectedContext) }
-                    )
+                    bindingRow(label: "Key \(index + 1)", kind: .expressKey, index: index)
                 }
             }
         }
+    }
+
+    private func bindingRow(label: String, kind: ButtonKind, index: Int) -> some View {
+        let isDefaultContext = selectedContext == BindingStore.defaultContext
+        let stored = bindingStore.storedBinding(context: selectedContext, kind: kind, index: index)
+        let title: String
+        if let stored {
+            title = KeyCodeNames.description(for: stored)
+        } else if isDefaultContext {
+            title = KeyCodeNames.description(for: .none)
+        } else {
+            title = "Default (\(KeyCodeNames.description(for: bindingStore.binding(context: BindingStore.defaultContext, kind: kind, index: index))))"
+        }
+        return BindingRow(
+            label: label,
+            title: title,
+            canUseDefault: !isDefaultContext && stored != nil,
+            onChange: { bindingStore.setBinding($0, kind: kind, index: index, context: selectedContext) },
+            onUseDefault: { bindingStore.removeBinding(kind: kind, index: index, context: selectedContext) }
+        )
     }
 
     private var contextBar: some View {
@@ -60,7 +72,7 @@ struct ButtonsPage: View {
                 Picker("Bindings for", selection: $selectedContext) {
                     Text("Default (all apps)").tag(BindingStore.defaultContext)
                     ForEach(bindingStore.appContextOrder, id: \.self) { bundleID in
-                        Text(displayName(for: bundleID)).tag(bundleID)
+                        Text(AppNames.displayName(for: bundleID)).tag(bundleID)
                     }
                 }
                 .frame(maxWidth: 320)
@@ -89,18 +101,14 @@ struct ButtonsPage: View {
             }
         }
     }
-
-    private func displayName(for bundleID: String) -> String {
-        NSWorkspace.shared.runningApplications
-            .first { $0.bundleIdentifier == bundleID }?
-            .localizedName ?? bundleID
-    }
 }
 
 private struct BindingRow: View {
     let label: String
-    let action: ExpressKeyAction
+    let title: String
+    let canUseDefault: Bool
     let onChange: (ExpressKeyAction) -> Void
+    let onUseDefault: () -> Void
 
     var body: some View {
         HStack {
@@ -109,7 +117,7 @@ private struct BindingRow: View {
                 .foregroundStyle(.secondary)
                 .accessibilityHidden(true)
 
-            ShortcutRecorderButton(action: action, onCapture: onChange)
+            ShortcutRecorderButton(title: title, onCapture: onChange)
                 .glassButton()
                 .frame(minWidth: 180)
                 .accessibilityLabel(label)
@@ -117,7 +125,10 @@ private struct BindingRow: View {
             Spacer()
 
             Menu {
-                Button("Clear") { onChange(.none) }
+                if canUseDefault {
+                    Button("Use Default") { onUseDefault() }
+                }
+                Button("Set to None") { onChange(.none) }
                 Button("Launch App…") { pickApp() }
             } label: {
                 Image(systemName: "ellipsis.circle")

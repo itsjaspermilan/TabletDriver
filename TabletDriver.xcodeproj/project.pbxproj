@@ -17,12 +17,15 @@
 		23E766C84C639B7D4400A515 /* PressureTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A73ADB862A1D98163599B599 /* PressureTestView.swift */; };
 		2A94A334ED53765E11DA329D /* TabletDriverApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725141724FCA579A2BD0E9A7 /* TabletDriverApp.swift */; };
 		3E02084C65A9866EAB63F9DB /* libTabletDriverKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CFDFCA25F16846B09299999 /* libTabletDriverKit.a */; };
+		3EC14B41302242407358CFBE /* PersistedJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F2EF9C5CA86B4FD3F5A69C /* PersistedJSON.swift */; };
 		46906A9A7AAA270B5295B6AC /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = CE0F6C2A7F44C0FDC83FF39A /* AppIcon.icon */; };
 		487A53936A021314A740C5EF /* KeyCodeNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF109CE13C854F4120C78BB /* KeyCodeNames.swift */; };
+		50BD7C2D2E4BEBAED0D90EC5 /* ClickThresholdScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761C1A4EE26CBC74CE3A0157 /* ClickThresholdScale.swift */; };
 		67C776FDEE0DAA16353791A0 /* PenReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4F47982C6BC20AB563C654 /* PenReport.swift */; };
 		83E9493BADA22BAEDE5A9B64 /* DecoMini7V2Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AAC6C2E5DBACD2CEFC410D /* DecoMini7V2Profile.swift */; };
 		85728D39B473E2B632A154F4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D90F49601439B940A51F3F /* SettingsView.swift */; };
 		95A6805BABDE71C696680638 /* AboutPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3E7146C99F870DCE489611B /* AboutPage.swift */; };
+		961397648A6F9636771BF24F /* Deco640Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5CF32DD3CEA33B2ECF2734C /* Deco640Profile.swift */; };
 		982CD09C1838C2E519878E64 /* ScreenMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7102C4C6DF2502FE7C677B8 /* ScreenMapperTests.swift */; };
 		A09B074646A57E7B250113FF /* TabletProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B20B6262F58D12FDFBAF459 /* TabletProfile.swift */; };
 		B61CE5A2F5214EC97A3A7C74 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B7883AA813CB16CC3375F36 /* OnboardingView.swift */; };
@@ -30,10 +33,12 @@
 		BA3C2B38B33A77DECE6F9947 /* KeyCodeNamesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390AAB26A965F925245C1933 /* KeyCodeNamesTests.swift */; };
 		BC0A42A50F2F1AA15BBB28C5 /* GlassStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB9814253F0D87AE246065A /* GlassStyle.swift */; };
 		C2E06B1101240C266547BDF8 /* AuxReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0728E8FC3340FEA5464267 /* AuxReport.swift */; };
+		C5305217AE6D3EF52A49F3DA /* Deco640ProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F038A18C87A8E1CBABEAB1 /* Deco640ProfileTests.swift */; };
 		C6F047E8E8806B88CD272031 /* DriverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A999B21341E3C9366B9D0E76 /* DriverController.swift */; };
 		CD722341FE640D30CA77EA12 /* ScreenMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5B1979250D80DAB303CA14 /* ScreenMapper.swift */; };
 		D24661D587A3894240E3E9E6 /* ShortcutExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE02608D08D20BAC320483A3 /* ShortcutExecutor.swift */; };
 		D4095F348A44630B120EF934 /* ButtonsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32D7C7E335ED747FC88B42C /* ButtonsPage.swift */; };
+		D4B8AD89C63E5E266366479D /* AppNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C98D3216EFEE8667427756 /* AppNames.swift */; };
 		DAC9C51EBFF395D8AEFA4497 /* DeviceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 025AAEA2CB1A4AC12CB2574A /* DeviceMonitor.swift */; };
 		DDB3CA9E117CA2BC90A33BC5 /* libTabletDriverKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CFDFCA25F16846B09299999 /* libTabletDriverKit.a */; };
 		DE39365BA96AA724E5090003 /* PermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69901BE3EFABAAFFD0A776A8 /* PermissionManager.swift */; };
@@ -41,6 +46,7 @@
 		E739697B0878ED45392A89A1 /* DecoMini7V2ProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57750F6DAF3FC56FD4FE0FF /* DecoMini7V2ProfileTests.swift */; };
 		EA245EBEDCBDE5EF42A6E961 /* DriverPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E94CBE4E36C8E238A746183 /* DriverPreferencesTests.swift */; };
 		EFA2A3932492BDC92010F78C /* InstallController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C35E3DB80B43023A0B9381B /* InstallController.swift */; };
+		F7EB9E3E8509604489738C16 /* ClickThresholdScaleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3891DD9ACDFCDDDD2EF2B45E /* ClickThresholdScaleTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,8 +73,10 @@
 		16AAC6C2E5DBACD2CEFC410D /* DecoMini7V2Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoMini7V2Profile.swift; sourceTree = "<group>"; };
 		1C35E3DB80B43023A0B9381B /* InstallController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallController.swift; sourceTree = "<group>"; };
 		332B2A575B8A94601B9AB6BA /* ShortcutRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorder.swift; sourceTree = "<group>"; };
+		3891DD9ACDFCDDDD2EF2B45E /* ClickThresholdScaleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickThresholdScaleTests.swift; sourceTree = "<group>"; };
 		390AAB26A965F925245C1933 /* KeyCodeNamesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyCodeNamesTests.swift; sourceTree = "<group>"; };
 		44662E31D7FED07199BA924B /* TabletDriverApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TabletDriverApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		44F038A18C87A8E1CBABEAB1 /* Deco640ProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deco640ProfileTests.swift; sourceTree = "<group>"; };
 		49ABDA781233402B9DECFA62 /* TabletDriverKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TabletDriverKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CFDFCA25F16846B09299999 /* libTabletDriverKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTabletDriverKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		56B9B30F4535831C9166FA7B /* CursorPosterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorPosterTests.swift; sourceTree = "<group>"; };
@@ -77,10 +85,12 @@
 		69901BE3EFABAAFFD0A776A8 /* PermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManager.swift; sourceTree = "<group>"; };
 		6AB0D6945C2E4C421753F340 /* CursorPoster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorPoster.swift; sourceTree = "<group>"; };
 		725141724FCA579A2BD0E9A7 /* TabletDriverApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabletDriverApp.swift; sourceTree = "<group>"; };
+		761C1A4EE26CBC74CE3A0157 /* ClickThresholdScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickThresholdScale.swift; sourceTree = "<group>"; };
 		7C4F47982C6BC20AB563C654 /* PenReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PenReport.swift; sourceTree = "<group>"; };
 		821360FEBC010CF7C5E7AB55 /* DriverPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriverPreferences.swift; sourceTree = "<group>"; };
 		8A93DCD2CDE8F7764E73655C /* TabletProfileRegistryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabletProfileRegistryTests.swift; sourceTree = "<group>"; };
 		8E94CBE4E36C8E238A746183 /* DriverPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriverPreferencesTests.swift; sourceTree = "<group>"; };
+		A1C98D3216EFEE8667427756 /* AppNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNames.swift; sourceTree = "<group>"; };
 		A57750F6DAF3FC56FD4FE0FF /* DecoMini7V2ProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoMini7V2ProfileTests.swift; sourceTree = "<group>"; };
 		A653F7A76EF069ED3BDB9B97 /* BindingStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BindingStoreTests.swift; sourceTree = "<group>"; };
 		A73ADB862A1D98163599B599 /* PressureTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressureTestView.swift; sourceTree = "<group>"; };
@@ -93,7 +103,9 @@
 		CE0F6C2A7F44C0FDC83FF39A /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		D32D7C7E335ED747FC88B42C /* ButtonsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonsPage.swift; sourceTree = "<group>"; };
 		D8D90F49601439B940A51F3F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		E5CF32DD3CEA33B2ECF2734C /* Deco640Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deco640Profile.swift; sourceTree = "<group>"; };
 		F3E7146C99F870DCE489611B /* AboutPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutPage.swift; sourceTree = "<group>"; };
+		F4F2EF9C5CA86B4FD3F5A69C /* PersistedJSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistedJSON.swift; sourceTree = "<group>"; };
 		F7102C4C6DF2502FE7C677B8 /* ScreenMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenMapperTests.swift; sourceTree = "<group>"; };
 		FAC50B1B280BF5C406EC5189 /* BindingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BindingStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -133,6 +145,7 @@
 			children = (
 				A999B21341E3C9366B9D0E76 /* DriverController.swift */,
 				821360FEBC010CF7C5E7AB55 /* DriverPreferences.swift */,
+				F4F2EF9C5CA86B4FD3F5A69C /* PersistedJSON.swift */,
 				98795943FC4A48411015E33F /* HID */,
 				B444E98359CA828098AF236F /* Mapping */,
 				753453E4F44951920BE8F20D /* Output */,
@@ -164,6 +177,7 @@
 		6FD5F80D39BFE74E1AAD4722 /* Profiles */ = {
 			isa = PBXGroup;
 			children = (
+				E5CF32DD3CEA33B2ECF2734C /* Deco640Profile.swift */,
 				16AAC6C2E5DBACD2CEFC410D /* DecoMini7V2Profile.swift */,
 				0B20B6262F58D12FDFBAF459 /* TabletProfile.swift */,
 				66D6752A36B0C97D3DABBB76 /* TabletProfileRegistry.swift */,
@@ -174,6 +188,7 @@
 		753453E4F44951920BE8F20D /* Output */ = {
 			isa = PBXGroup;
 			children = (
+				761C1A4EE26CBC74CE3A0157 /* ClickThresholdScale.swift */,
 				6AB0D6945C2E4C421753F340 /* CursorPoster.swift */,
 				5B5B1979250D80DAB303CA14 /* ScreenMapper.swift */,
 				CE02608D08D20BAC320483A3 /* ShortcutExecutor.swift */,
@@ -193,7 +208,9 @@
 			isa = PBXGroup;
 			children = (
 				A653F7A76EF069ED3BDB9B97 /* BindingStoreTests.swift */,
+				3891DD9ACDFCDDDD2EF2B45E /* ClickThresholdScaleTests.swift */,
 				56B9B30F4535831C9166FA7B /* CursorPosterTests.swift */,
+				44F038A18C87A8E1CBABEAB1 /* Deco640ProfileTests.swift */,
 				A57750F6DAF3FC56FD4FE0FF /* DecoMini7V2ProfileTests.swift */,
 				8E94CBE4E36C8E238A746183 /* DriverPreferencesTests.swift */,
 				390AAB26A965F925245C1933 /* KeyCodeNamesTests.swift */,
@@ -236,6 +253,7 @@
 		B444E98359CA828098AF236F /* Mapping */ = {
 			isa = PBXGroup;
 			children = (
+				A1C98D3216EFEE8667427756 /* AppNames.swift */,
 				FAC50B1B280BF5C406EC5189 /* BindingStore.swift */,
 				AAF109CE13C854F4120C78BB /* KeyCodeNames.swift */,
 			);
@@ -382,7 +400,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				1CD2C32E1578851AF6663154 /* BindingStoreTests.swift in Sources */,
+				F7EB9E3E8509604489738C16 /* ClickThresholdScaleTests.swift in Sources */,
 				1FE859554367B75279A17639 /* CursorPosterTests.swift in Sources */,
+				C5305217AE6D3EF52A49F3DA /* Deco640ProfileTests.swift in Sources */,
 				E739697B0878ED45392A89A1 /* DecoMini7V2ProfileTests.swift in Sources */,
 				EA245EBEDCBDE5EF42A6E961 /* DriverPreferencesTests.swift in Sources */,
 				BA3C2B38B33A77DECE6F9947 /* KeyCodeNamesTests.swift in Sources */,
@@ -412,9 +432,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4B8AD89C63E5E266366479D /* AppNames.swift in Sources */,
 				C2E06B1101240C266547BDF8 /* AuxReport.swift in Sources */,
 				106E9CEA5ED23E4CCDBCCAEA /* BindingStore.swift in Sources */,
+				50BD7C2D2E4BEBAED0D90EC5 /* ClickThresholdScale.swift in Sources */,
 				00F551002E3B25FD7725E49D /* CursorPoster.swift in Sources */,
+				961397648A6F9636771BF24F /* Deco640Profile.swift in Sources */,
 				83E9493BADA22BAEDE5A9B64 /* DecoMini7V2Profile.swift in Sources */,
 				DAC9C51EBFF395D8AEFA4497 /* DeviceMonitor.swift in Sources */,
 				C6F047E8E8806B88CD272031 /* DriverController.swift in Sources */,
@@ -422,6 +445,7 @@
 				487A53936A021314A740C5EF /* KeyCodeNames.swift in Sources */,
 				67C776FDEE0DAA16353791A0 /* PenReport.swift in Sources */,
 				DE39365BA96AA724E5090003 /* PermissionManager.swift in Sources */,
+				3EC14B41302242407358CFBE /* PersistedJSON.swift in Sources */,
 				CD722341FE640D30CA77EA12 /* ScreenMapper.swift in Sources */,
 				D24661D587A3894240E3E9E6 /* ShortcutExecutor.swift in Sources */,
 				A09B074646A57E7B250113FF /* TabletProfile.swift in Sources */,

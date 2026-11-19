@@ -38,8 +38,7 @@ public final class BindingStore: ObservableObject {
     public init(applicationSupportDirectory: URL) {
         self.fileURL = applicationSupportDirectory.appendingPathComponent("bindings.json")
 
-        if let data = try? Data(contentsOf: fileURL),
-           let decoded = try? JSONDecoder().decode(StoredBindings.self, from: data) {
+        if let decoded = PersistedJSON.load(StoredBindings.self, from: fileURL) {
             contexts = decoded.contexts
             appContextOrder = decoded.appContextOrder
         } else {
@@ -48,20 +47,29 @@ public final class BindingStore: ObservableObject {
         }
     }
 
-    /// Bindings to use for the given frontmost app, falling back to
-    /// defaults, as an array sized to `count` (missing indices are `.none`).
+    /// Bindings to use for the given frontmost app, as an array sized to
+    /// `count`. Each index falls back to the default context on its own, so
+    /// overriding one key for an app doesn't disable the app's other keys;
+    /// an override explicitly set to `.none` still disables that key.
     public func bindings(for bundleIdentifier: String?, kind: ButtonKind, count: Int) -> [ExpressKeyAction] {
-        let byIndex: [Int: ExpressKeyAction]
-        if let bundleIdentifier, let overrides = contexts[bundleIdentifier]?[kind] {
-            byIndex = overrides
-        } else {
-            byIndex = contexts[Self.defaultContext]?[kind] ?? [:]
-        }
-        return (0..<count).map { byIndex[$0] ?? .none }
+        let overrides = bundleIdentifier.flatMap { contexts[$0]?[kind] } ?? [:]
+        let defaults = contexts[Self.defaultContext]?[kind] ?? [:]
+        return (0..<count).map { overrides[$0] ?? defaults[$0] ?? .none }
     }
 
     public func binding(context: String, kind: ButtonKind, index: Int) -> ExpressKeyAction {
         contexts[context]?[kind]?[index] ?? .none
+    }
+
+    /// The binding stored for exactly this context, or nil if it inherits
+    /// from the default context.
+    public func storedBinding(context: String, kind: ButtonKind, index: Int) -> ExpressKeyAction? {
+        contexts[context]?[kind]?[index]
+    }
+
+    public func removeBinding(kind: ButtonKind, index: Int, context: String) {
+        contexts[context]?[kind]?.removeValue(forKey: index)
+        save()
     }
 
     public func setBinding(_ action: ExpressKeyAction, kind: ButtonKind, index: Int, context: String) {
@@ -92,13 +100,7 @@ public final class BindingStore: ObservableObject {
     }
 
     private func save() {
-        let stored = StoredBindings(contexts: contexts, appContextOrder: appContextOrder)
-        guard let data = try? JSONEncoder().encode(stored) else { return }
-        try? FileManager.default.createDirectory(
-            at: fileURL.deletingLastPathComponent(),
-            withIntermediateDirectories: true
-        )
-        try? data.write(to: fileURL)
+        PersistedJSON.save(StoredBindings(contexts: contexts, appContextOrder: appContextOrder), to: fileURL)
     }
 
     private struct StoredBindings: Codable {

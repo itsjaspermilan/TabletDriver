@@ -4,6 +4,7 @@ import Foundation
 /// `TabletProfile` here to make it available -- see CONTRIBUTING.md.
 public enum TabletProfileRegistry {
     public static let all: [TabletProfile] = [
-        DecoMini7V2Profile()
+        DecoMini7V2Profile(),
+        Deco640Profile()
     ]
 }

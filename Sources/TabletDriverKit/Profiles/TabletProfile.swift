@@ -31,7 +31,8 @@ public protocol TabletProfile {
     /// sees these raw values.
     var maxX: Double { get }
     var maxY: Double { get }
-    /// Native maximum pressure value, used to normalize `PenReport.pressure`.
+    /// Native maximum pressure value, used to normalize `PenReport.pressure`
+    /// (clamp the result to 1 -- some pens report slightly past their max).
     var maxPressure: UInt16 { get }
 
     /// Number of express keys this tablet has (0 if none).

@@ -27,7 +27,9 @@ ZIP_PATH="$BUILD_DIR/$APP_NAME-$VERSION.zip"
 SIGN_IDENTITY="$(security find-identity -v -p codesigning | grep -m1 'Developer ID Application' | awk -F'"' '{print $2}' || true)"
 if [ -z "$SIGN_IDENTITY" ]; then
     SIGN_IDENTITY="-"
-    echo "==> No Developer ID identity found; building ad-hoc signed"
+    echo "==> No Developer ID identity found; building ad-hoc signed" >&2
+    echo "    WARNING: recipients must approve it in Privacy & Security, and their" >&2
+    echo "    Input Monitoring/Accessibility grants may not survive app updates." >&2
 else
     echo "==> Signing with: $SIGN_IDENTITY"
 fi

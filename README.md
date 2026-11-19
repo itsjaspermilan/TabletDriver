@@ -136,8 +136,18 @@ values) — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Uninstall
 
-Use the app's menu bar "Uninstall…" item, or run `scripts/uninstall.sh` if
-the app has already been removed.
+Use the app's menu bar "Uninstall…" item (it asks for confirmation, then
+removes your settings, the login item and both permission grants, and moves
+the app to the Trash), or run `scripts/uninstall.sh` if the app has already
+been removed.
+
+## Security notes
+
+TabletDriver needs Accessibility and Input Monitoring, so it can post any
+keystroke or click. Express-key and pen-button bindings live in
+`~/Library/Application Support/TabletDriver/bindings.json`, and the app
+replays whatever shortcut or app launch that file names. Anything running
+as your user can edit it, the same as any other per-user config.
 
 ## Contributing
 

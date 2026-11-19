@@ -11,18 +11,14 @@ struct PressureTestView: View {
     let driver: DriverController
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var strokes: [[Sample]] = []
+    @State private var finishedStrokes: [[StrokeSample]] = []
+    @State private var finishedStrokesVersion = 0
+    @State private var currentStroke: [StrokeSample] = []
     @State private var history: [Double] = []
     @State private var peak = 0.0
-    @State private var isDrawing = false
     @State private var canvasScreenFrame: CGRect = .zero
     @State private var isHoveringCanvas = false
     @State private var hoverPoint: CGPoint?
-
-    private struct Sample {
-        let point: CGPoint
-        let pressure: Double
-    }
 
     private let historyLength = 200
 
@@ -43,6 +39,7 @@ struct PressureTestView: View {
             isHoveringCanvas = canvasScreenFrame.contains(mouseLocation)
             guard isHoveringCanvas, let pen, let point = canvasRelativePoint(for: mouseLocation) else {
                 hoverPoint = nil
+                finishCurrentStroke()
                 return
             }
             hoverPoint = point
@@ -52,7 +49,9 @@ struct PressureTestView: View {
         .toolbar {
             ToolbarItem {
                 Button("Clear") {
-                    strokes.removeAll()
+                    finishedStrokes.removeAll()
+                    finishedStrokesVersion += 1
+                    currentStroke.removeAll()
                     peak = 0
                 }
             }
@@ -62,41 +61,24 @@ struct PressureTestView: View {
     private var pressure: Double { isHoveringCanvas ? (driver.lastPenReport?.pressure ?? 0) : 0 }
     private var hoveredPenReport: PenReport? { isHoveringCanvas ? driver.lastPenReport : nil }
 
-    private var canvas: some View {
-        Canvas { context, size in
-            for stroke in strokes {
-                for (a, b) in zip(stroke, stroke.dropFirst()) {
-                    var path = Path()
-                    path.move(to: CGPoint(x: a.point.x * size.width, y: a.point.y * size.height))
-                    path.addLine(to: CGPoint(x: b.point.x * size.width, y: b.point.y * size.height))
-                    let level = (a.pressure + b.pressure) / 2
-                    context.stroke(
-                        path,
-                        with: .color(strokeColor(level)),
-                        style: StrokeStyle(lineWidth: 1 + level * 16, lineCap: .round)
-                    )
-                }
-            }
+    private var strokeCount: Int { finishedStrokes.count + (currentStroke.isEmpty ? 0 : 1) }
 
-            if let hoverPoint {
-                let center = CGPoint(x: hoverPoint.x * size.width, y: hoverPoint.y * size.height)
-                let radius = 6 + pressure * 14
-                context.stroke(
-                    Path(ellipseIn: CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2)),
-                    with: .color(.white.opacity(0.8)),
-                    lineWidth: 1.5
-                )
-            }
+    private var canvas: some View {
+        ZStack {
+            FinishedStrokesLayer(strokes: finishedStrokes, version: finishedStrokesVersion)
+                .equatable()
+            liveLayer
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityElement(children: .ignore)
         .accessibilityLabel("Drawing canvas")
-        .accessibilityValue(strokes.isEmpty ? "Empty" : "\(strokes.count) strokes")
+        .accessibilityValue(strokeCount == 0 ? "Empty" : "\(strokeCount) strokes")
         .accessibilityHint("Move the pen over this area to test pressure")
         // Opaque enough that the placeholder text below keeps ~5:1
         // contrast over the light-mode glass, not just the dark-mode one.
         .background(Color.black.opacity(0.7), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay {
-            if strokes.isEmpty {
+            if strokeCount == 0 {
                 VStack(spacing: 6) {
                     Image(systemName: "scribble.variable").font(.largeTitle)
                     Text(isHoveringCanvas ? "Draw with the pen" : "Move the cursor here to test")
@@ -114,6 +96,24 @@ struct PressureTestView: View {
         .background(ScreenFrameReader(screenFrame: $canvasScreenFrame))
     }
 
+    /// Only the stroke in progress and the hover ring, which change every
+    /// report; finished strokes live in `FinishedStrokesLayer`.
+    private var liveLayer: some View {
+        Canvas { context, size in
+            StrokeSample.draw(currentStroke, in: &context, size: size)
+
+            if let hoverPoint {
+                let center = CGPoint(x: hoverPoint.x * size.width, y: hoverPoint.y * size.height)
+                let radius = 6 + pressure * 14
+                context.stroke(
+                    Path(ellipseIn: CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2)),
+                    with: .color(.white.opacity(0.8)),
+                    lineWidth: 1.5
+                )
+            }
+        }
+    }
+
     private var sidePanel: some View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 2) {
@@ -126,7 +126,7 @@ struct PressureTestView: View {
                 HStack {
                     Text("Peak \(Int(peak * 100))%")
                     Spacer()
-                    Text("Click at \(Int(driver.clickThreshold * 100))%")
+                    Text("Click at \(ClickThresholdScale.label(for: driver.clickThreshold))")
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -134,7 +134,7 @@ struct PressureTestView: View {
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Pressure")
-            .accessibilityValue("\(Int(pressure * 100))%, peak \(Int(peak * 100))%, clicks at \(Int(driver.clickThreshold * 100))%")
+            .accessibilityValue("\(Int(pressure * 100))%, peak \(Int(peak * 100))%, clicks at \(ClickThresholdScale.label(for: driver.clickThreshold))")
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("Last few seconds").font(.caption).foregroundStyle(.secondary)
@@ -228,10 +228,6 @@ struct PressureTestView: View {
         return pressed.isEmpty ? "None pressed" : "\(pressed.joined(separator: ", ")) pressed"
     }
 
-    private func strokeColor(_ level: Double) -> Color {
-        Color(hue: 0.55 + 0.4 * level, saturation: 0.7, brightness: 1)
-    }
-
     /// `pen.x`/`.y` are normalized across the *whole* tablet, which
     /// `ScreenMapper` maps onto the whole screen/active window -- not onto
     /// this canvas. Deriving the point from where the real cursor actually
@@ -251,15 +247,57 @@ struct PressureTestView: View {
         if history.count > historyLength { history.removeFirst(history.count - historyLength) }
         peak = max(peak, pen.pressure)
 
-        let sample = Sample(point: point, pressure: pen.pressure)
         if pen.pressure > 0 {
-            if !isDrawing {
-                strokes.append([])
-                isDrawing = true
-            }
-            strokes[strokes.count - 1].append(sample)
+            currentStroke.append(StrokeSample(point: point, pressure: pen.pressure))
         } else {
-            isDrawing = false
+            finishCurrentStroke()
+        }
+    }
+
+    private func finishCurrentStroke() {
+        guard !currentStroke.isEmpty else { return }
+        finishedStrokes.append(currentStroke)
+        finishedStrokesVersion += 1
+        currentStroke.removeAll()
+    }
+}
+
+private struct StrokeSample {
+    let point: CGPoint
+    let pressure: Double
+
+    static func draw(_ stroke: [StrokeSample], in context: inout GraphicsContext, size: CGSize) {
+        for (a, b) in zip(stroke, stroke.dropFirst()) {
+            var path = Path()
+            path.move(to: CGPoint(x: a.point.x * size.width, y: a.point.y * size.height))
+            path.addLine(to: CGPoint(x: b.point.x * size.width, y: b.point.y * size.height))
+            let level = (a.pressure + b.pressure) / 2
+            context.stroke(
+                path,
+                with: .color(Color(hue: 0.55 + 0.4 * level, saturation: 0.7, brightness: 1)),
+                style: StrokeStyle(lineWidth: 1 + level * 16, lineCap: .round)
+            )
+        }
+    }
+}
+
+/// Every completed stroke, redrawn only when one is added or cleared
+/// (`version` changes) rather than on every pen report -- redrawing all of
+/// them per report took ~17ms at 5,000 segments, on the same main thread
+/// that handles tablet input, so the cursor lagged while this page was open.
+private struct FinishedStrokesLayer: View, Equatable {
+    let strokes: [[StrokeSample]]
+    let version: Int
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.version == rhs.version
+    }
+
+    var body: some View {
+        Canvas { context, size in
+            for stroke in strokes {
+                StrokeSample.draw(stroke, in: &context, size: size)
+            }
         }
     }
 }
@@ -277,8 +315,10 @@ private struct ScreenFrameReader: NSViewRepresentable {
     func updateNSView(_ nsView: NSView, context: Context) {
         DispatchQueue.main.async {
             guard let window = nsView.window else { return }
-            let windowRect = nsView.convert(nsView.bounds, to: nil)
-            screenFrame = window.convertToScreen(windowRect)
+            let frame = window.convertToScreen(nsView.convert(nsView.bounds, to: nil))
+            if frame != screenFrame {
+                screenFrame = frame
+            }
         }
     }
 }
